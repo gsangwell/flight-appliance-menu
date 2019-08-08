@@ -59,6 +59,6 @@ EOF
 
 touch /etc/sudoers.d/10-alces-appliance
 cat << EOF > /etc/sudoers.d/10-alces-appliance
-Cmnd_Alias OPS = /sbin/usermod engineer --shell /bin/bash,/sbin/dmidecode,/sbin/usermod engineer --shell /sbin/nologin,/bin/at now + 1 minutes -f /tmp/disable.sh
+Cmnd_Alias OPS = /sbin/usermod engineer --shell /bin/bash,/sbin/dmidecode,/sbin/usermod engineer --shell /sbin/nologin,/bin/at now + 1 hour -f /tmp/disable.sh,/sbin/useradd,/sbin/lid,/sbin/shutdown
 %operators      ALL = NOPASSWD: OPS
 EOF

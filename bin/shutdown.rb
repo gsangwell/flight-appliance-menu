@@ -28,5 +28,5 @@
 
 def shutdown()
   puts "shutting down..."
-  system('shutdown -h now')
+  system('sudo shutdown -h now')
 end
