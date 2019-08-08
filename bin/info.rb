@@ -26,6 +26,7 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
+
 def infomenu()
   sel = $prompt.select('Choose an option') do |menu|
     menu.choice 'View Instance Information', 'infoinst'
@@ -47,47 +48,69 @@ def infomenu()
   end
 end
 
-def inetstat()
-  info = []
-  info << ['Ping 8.8.8.8? ', pingip()]
-  info << ['Resolve alces-software.com? ', resolv()]
-  info << ['Default Gateway', gw()]
-  info << ['Primary DNS Server', dns('nameserver')]
-  info << ['Search Domain', dns('search')]
-  infotable = Terminal::Table.new :title => "Internet Connectivity Information", :rows => info
-  return infotable
+def inetstat_table_generate()
+  table = []
+  table << ['Ping 8.8.8.8? ', pingip()]
+  table << ['Resolve alces-software.com? ', resolv('alces-software.com')]
+  table << ['Default Gateway', gw()]
+  table << ['Primary DNS Server', dns('nameserver').first]
+  table << ['Search Domain', dns('search').first]
+  title = "Internet Connectivity Information"
+  ary = [title, table]
+  return ary
 end
 
-def pingip
+def inetstat()
+  inetstat_table = inetstat_table_generate()
+  puts outputTable(inetstat_table[0], inetstat_table[1])
+end
+
+def pingip_test()
   begin
     Net::Ping::External.new("8.8.8.8").ping?
-    return "Responding"
+    return true
   rescue
+    return false
+  end
+end
+
+def pingip()
+  if pingip_test()
+    return "Responding"
+  else
     return "Not Responding"
   end
 end
 
-def resolv()
+def resolv(address)
   dns_resolver = Resolv::DNS.new()
-  begin
-    resolv = dns_resolver.getaddress("alces-software.com")
-    return resolv.to_s
+  begin dns_resolver.getaddress(address) 
+    return true
   rescue 
-    return "ERROR - Cannot Resolve IP"
+    return false
   end
 end
 
 def gw()
-  gw = `/sbin/ip route show`[/default.*/][/\d+\.\d+\.\d+\.\d+/]
-  return gw
+  begin
+    gw = `/sbin/ip route show`[/default.*/][/\d+\.\d+\.\d+\.\d+/]
+    return gw
+  rescue
+    return false
+  end
 end
 
-def dns(type)
+def dns(*type)
   dns = Resolv::DNS::Config.default_config_hash
-  case type
+  case type[0]
   when 'nameserver'
-    return dns[:nameserver].first
+    return dns[:nameserver]
   when 'search'
-    return dns[:search].first
+    return dns[:search]
+  else
+    hash = {}
+    hash.merge!(nameservers: dns[:nameserver])
+    hash.merge!(search: dns[:search])
+    return hash
   end
 end

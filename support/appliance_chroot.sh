@@ -43,12 +43,12 @@ cd /opt/appliance
 
 groupadd engineers
 groupadd operators
-useradd engineer -G engineers operators
+useradd engineer -G engineers -G operators
 useradd alces-operator -G operators
-passwd -l engineer
-passwd -l alces-operator
 usermod alces-operator --shell /opt/appliance/bin/cli.rb
 usermod engineer --shell /sbin/nologin
+
+sed -i -e 's/PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
 
 mkdir -p /home/engineer/.ssh
 touch /home/engineer/.ssh/authorized_keys
@@ -60,5 +60,5 @@ EOF
 touch /etc/sudoers.d/10-alces-appliance
 cat << EOF > /etc/sudoers.d/10-alces-appliance
 Cmnd_Alias OPS = /sbin/usermod engineer --shell /bin/bash,/sbin/dmidecode,/sbin/usermod engineer --shell /sbin/nologin,/bin/at now + 1 minutes -f /tmp/disable.sh
-%operators      ALL = NOPASSWD: OPS 
+%operators      ALL = NOPASSWD: OPS
 EOF

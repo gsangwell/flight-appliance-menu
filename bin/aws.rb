@@ -26,8 +26,8 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-def aws()
-  puts "yeah aws"
+def platform()
+  return "Amazon AWS"
 end
 
 def extip()
@@ -59,13 +59,19 @@ def instanceType()
 end
 
 def infoinst()
-  info = []
-  info << ['Platform', "Amazon AWS"]
-  info << ['Region', region()]
-  info << ['Instance Type', identity('instanceType')]
-  info << ['External IP Address', extip()]
-  info << ['Internal IP Address', intip()]
-  info << ['Hostname', hostname()]
-  infotable = Terminal::Table.new :title => "Instance Information", :rows => info
-  return infotable
+  infoinst_table = infoinst_table_generate()
+  puts outputTable(infoinst_table[0], infoinst_table[1])
+end
+
+def infoinst_table_generate()
+  table = []
+  table << ['Platform', "Amazon AWS"]
+  table << ['Availability Zone', identity('availabilityZone')]
+  table << ['Instance Type', identity('instanceType')]
+  table << ['External IP Address', extip()]
+  table << ['Internal IP Address', intip()]
+  table << ['Hostname', hostname()]
+  title = "Instance Information"
+  ary = [title, table]
+  return ary
 end

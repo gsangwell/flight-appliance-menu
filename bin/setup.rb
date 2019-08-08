@@ -33,12 +33,16 @@ require 'net/http'
 require 'net/ping'
 require 'resolv'
 require 'terminal-table'
+require 'yaml'
+require 'json'
+require 'open3'
+
+require 'common'
 require 'userman'
 require 'engmode'
 require 'info'
 require 'shutdown'
 require 'cluster'
-require 'json'
 require 'fileutils'
 
 def setup()

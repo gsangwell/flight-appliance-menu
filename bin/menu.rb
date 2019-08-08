@@ -62,6 +62,11 @@ def main()
       usermanager()
     when 'engmode'
       engmode()
+      puts '' 
+      puts '=========='
+      puts "Alces Engineering Mode is now enabled for 1 hour."
+      puts '=========='
+      puts ''
     when 'shutdown'
       shutdown()
     when 'getout'

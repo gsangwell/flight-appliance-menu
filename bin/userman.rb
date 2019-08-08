@@ -31,7 +31,7 @@ def usermanager()
   when 'viewusers'
     puts viewusers()
   when 'newuser'
-    newuser()
+    newUser()
   when 'getout'
     main()
   end
@@ -47,49 +47,62 @@ def usermenu()
   return sel
 end
 
-def viewusers()
-  users = `sudo lid -g operators`.split
-  userstable = Terminal::Table.new :title => "Users", :rows => users.zip
-  return userstable
+def getUserList()
+  return `sudo lid -g operators`.split
 end
 
-def getuser()
-  fname = $prompt.ask("New User's Full Name:", required: true)
-  uname = $prompt.ask("Username: ", required: true)
+def viewusers()
+  users = getUserList()
+  return outputTable("Users", users.zip)
+end
+
+def getUser()
+  begin
+    fname = $prompt.ask("New User's Full Name:", required: true)
+    uname = $prompt.ask("Username: ", required: true)
+  rescue
+    main()
+  end
   user = [] 
   user << uname
   user << fname
   return user
 end
 
-def newuser()
-  user = getuser()
-  createuser(user[0],user[1])
-  sshkey(user[0],getkey())
+def newUser()
+  user = getUser()
+  createUser(user[0],user[1])
+  setUserSSHKey(user[0],getKey())
 end
 
-def createuser(uname,fname)
-  system("sudo \/sbin\/useradd #{uname} -G operators --comment \"#{fname}\" --shell /opt/appliance/bin/cli.rb")
+def createUser(uname,fname)
+  Open3.capture3("sudo \/sbin\/useradd #{uname} -G operators --comment \"#{fname}\" --shell /opt/appliance/bin/cli.rb")
 end
 
-def getkey()
+def getKey()
   key = $prompt.multiline("User's public SSH key", help: "(Paste user's public key here and press CTRL+D to end)")
   return key
 end
 
-def keyfromfile(file)
+#Currently unused - used for reading keys from files.
+def readKeyFromFile(file)
   key = []
   key << File.read(File.expand_path(file))
-  return key
+  return key.first
 end
 
-def sshkey(uname, key)
-  FileUtils.mkdir_p "/home/#{uname}/.ssh"
-  f = File.open("/home/#{uname}/.ssh/authorized_keys", 'w')
-  f.write(key.first)
-  f.chmod(0600)
-  f.close
-  FileUtils.chown(uname, uname, "/home/#{uname}/.ssh")
-  FileUtils.chmod(0700, "/home/#{uname}/.ssh") 
-  FileUtils.chown(uname, uname, "/home/#{uname}/.ssh/authorized_keys")
+def setUserSSHKey(uname, key)
+  begin
+    FileUtils.mkdir_p "/home/#{uname}/.ssh"
+    f = File.open("/home/#{uname}/.ssh/authorized_keys", 'w')
+    f.write(key)
+    f.chmod(0600)
+    f.close
+    FileUtils.chown(uname, uname, "/home/#{uname}/.ssh")
+    FileUtils.chmod(0700, "/home/#{uname}/.ssh") 
+    FileUtils.chown(uname, uname, "/home/#{uname}/.ssh/authorized_keys")
+    return true 
+  rescue
+    return false
+  end
 end

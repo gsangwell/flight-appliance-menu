@@ -42,35 +42,133 @@ Bundler.setup(:default)
 
 setup()
 
+def apiInetstat()
+  h = {}
+  h.merge!('ping-google': pingip_test())
+  h.merge!('resolve-alces-software': resolv('alces-software.com'))
+  h.merge!('default-gateway': gw())
+  h.merge!('dns-servers': dns('nameserver'))
+  h.merge!('search-domain': dns('search'))
+  return h.to_json
+end
+
+def apiEngMode()
+  engModeHandler(engmode()).to_json
+end
+
+
+def apiExtIp()
+  h = {}
+  h.merge!('external-ip': extip().gsub("\n",""))
+  return h.to_json
+end
+
+def apiAvailZone()
+  h = {}
+  h.merge!('availability-zone': region())
+  return h.to_json
+end
+
+def apiInstanceType()
+  h = {}
+  h.merge!('instance-type': instanceType())
+  return h.to_json
+end
+
+def apiIntIp()
+  h = {}
+  h.merge!('internal-ip': intip())
+  return h.to_json
+end
+
+def apiGetUserList()
+  h = {}
+  h.merge!(users: getUserList())
+  return h.to_json
+end
+
+def apiInfoInst()
+  h = {}
+  h.merge!('platform': platform())
+  h.merge!('availability-zone': identity('availabilityZone'))
+  h.merge!('instance-type': identity('instanceType'))
+  h.merge!('external-ip': extip().gsub("\n",""))
+  h.merge!('internal-ip': intip())
+  h.merge!('hostname': hostname())
+  return h.to_json
+end
+
+def apiSetKey(inputJson)
+  begin
+    hash = JSON.parse(inputJson)
+  rescue
+    return {'status' => false}
+  end
+  if hash['user-name'].nil? || hash['key'].nil?
+    return {'status' => false}
+  else 
+    uname = hash['user-name']
+    key = hash['key']
+  end
+  if setUserSSHKey(uname, key)
+    return {'user' => uname, 'status' => true}
+  else
+    return {'user' => uname, 'status' => false}
+  end
+end 
+
+def apiCreateUser(inputJson)
+  begin
+    hash = JSON.parse(inputJson)
+  rescue 
+    return {'status' => false} 
+  end
+  if ! hash['user-name'].nil? && ! hash['full-name'].nil?
+    uname = hash['user-name']
+    fname = hash['full-name']
+  else return {'status' => false}
+  end  
+  response = createUser(uname, fname)
+  if response[2].success?
+    return {'user-name' => uname, 'status' => true}
+  else
+    return {'user-name' => uname, 'status' => false, 'stdout' => response[0], 'stderr' => response[1]}
+  end
+    
+end
+
+def apiHelp()
+end
+
+
+
 begin
   case ARGV[0]
-  when 'infoinst'
-    puts infoinst()
-  when 'inetstat'
-    puts inetstat()
-  when 'extip'
-    puts extip()
-  when 'intip'
-    puts intip()
-  when 'region'
-    puts region()
+  when 'infoInst'
+    puts apiInfoInst()
+  when 'inetStat'
+    puts apiInetstat()
+  when 'extIp'
+    puts apiExtIp()
+  when 'intIp'
+    puts apiIntIp()
+  when 'availabilityZone'
+    puts apiAvailZone()
   when 'instanceType'
-    puts instanceType()
-  when 'engmode'
-    engmode()
-  when 'newuser'
-    createuser(ARGV[1],ARGV[2])
-  when 'userkey'
-    sshkey(ARGV[1],keyfromfile(ARGV[2]))
-  when 'viewusers'
-    puts viewusers()
+    puts apiInstanceType()
+  when 'engMode'
+    puts apiEngMode()
+  when 'userCreate'
+    puts apiCreateUser(ARGV[1]).to_json
+  when 'userSetKey'
+    puts apiSetKey(ARGV[1]).to_json
+  when 'userGetList'
+    puts apiGetUserList()
+  when 'help'
+    puts apiHelp()
   else
-    puts "Invalid Command"
+    puts "Invalid Command - use help for a list of requests"
   end
 
-  
-rescue => exception
-  
-else
   
 end
