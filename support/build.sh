@@ -136,10 +136,6 @@ chroot ${ROOTFS} systemctl enable sshd.service
 chroot ${ROOTFS} systemctl enable cloud-init.service
 chroot ${ROOTFS} systemctl mask tmp.mount
 
-#Get appliance in whilst we're here
-mkdir -p /rootfs/opt/appliance
-tar -zxvf /root/appliance.tar.gz -C /rootfs/opt/appliance
-
 #Prevent nouveau load
 echo "blacklist nouveau" > ${ROOTFS}/etc/modprobe.d/nouveau.conf
 
@@ -225,7 +221,6 @@ sed -i -e 's/^\(SELINUX=\).*/\1disabled/' ${ROOTFS}/etc/selinux/config
 # Clean up
 yum --installroot=$ROOTFS clean all
 truncate -c -s 0 ${ROOTFS}/var/log/yum.log
-
 
 #Cleanup
 yum --installroot=$ROOTFS clean all

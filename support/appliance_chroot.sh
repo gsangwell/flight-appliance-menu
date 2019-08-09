@@ -27,7 +27,13 @@
 #==============================================================================
 
 yum -y -e0 install patch autoconf automake bison bzip2 gcc-c++ libffi-devel libtool \
-patch readline-devel ruby sqlite-devel zlib-devel glibc-headers glibc-devel openssl-devel make
+patch readline-devel ruby sqlite-devel zlib-devel glibc-headers glibc-devel openssl-devel make unzip wget
+
+cd /opt
+wget https://github.com/alces-software/flight-appliance-menu/archive/master.zip
+unzip master.zip
+mv flight-appliance-menu-master appliance
+cd -
 
 . /etc/profile
 
