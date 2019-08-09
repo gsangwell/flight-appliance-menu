@@ -138,6 +138,23 @@ def apiCreateUser(inputJson)
 end
 
 def apiHelp()
+  <<~HEREDOC
+
+    api.rb [COMMAND] '{json-arguments}'
+
+    - infoInst - Return Cloud Instance information
+    - inetStat - Return Network Stats
+    - extIp - Return External IP Address
+    - intIp - Return Internal IP Address
+    - availabilityZone - Return Cloud Vendor Availability Zone
+    - instanceType - Return Cloud Vendor Instance Type
+    - engMode - Enable Alces Engineering Mode for 1 hour
+    - userCreate - Create a user - requires '{"user-name":"<System username>","full-name":"<User's full name>"}'
+    - userSetKey - Set SSH key for a system user - requires '{"user-name":"<System username>","key":"<SSH Key to be used>"}'
+    - userGetList - Return list of system users.
+
+
+  HEREDOC
 end
 
 
