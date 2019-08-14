@@ -47,14 +47,19 @@ require 'fileutils'
 
 def setup()
   bios = `sudo /usr/sbin/dmidecode -s bios-version | /bin/tr "[:upper:]" "[:lower:]" | /bin/grep "amazon"`
+  azure = `sudo /usr/sbin/dmidecode -s chassis-manufacturer`
   if bios.include? "amazon"
     provider = 'aws'
+  elsif azure.include? "Microsoft"
+    provider = 'azure'
   else
     provider = 'other'
   end
 
   if provider == 'aws'
     require 'aws.rb'
+  elsif provider == 'azure'
+    require 'azure.rb'
   else 
     puts "Unsupported cloud service"
   end

@@ -42,9 +42,9 @@ Bundler.setup(:default)
 
 setup()
 
-def apiInetstat()
+def apiInetStat()
   h = {}
-  h.merge!('ping-google': pingip_test())
+  h.merge!('ping-google': pingIpTest())
   h.merge!('resolve-alces-software': resolv('alces-software.com'))
   h.merge!('default-gateway': gw())
   h.merge!('dns-servers': dns('nameserver'))
@@ -59,7 +59,7 @@ end
 
 def apiExtIp()
   h = {}
-  h.merge!('external-ip': extip().gsub("\n",""))
+  h.merge!('external-ip': extIp().gsub("\n",""))
   return h.to_json
 end
 
@@ -77,7 +77,7 @@ end
 
 def apiIntIp()
   h = {}
-  h.merge!('internal-ip': intip())
+  h.merge!('internal-ip': intIp())
   return h.to_json
 end
 
@@ -88,14 +88,7 @@ def apiGetUserList()
 end
 
 def apiInfoInst()
-  h = {}
-  h.merge!('platform': platform())
-  h.merge!('availability-zone': identity('availabilityZone'))
-  h.merge!('instance-type': identity('instanceType'))
-  h.merge!('external-ip': extip().gsub("\n",""))
-  h.merge!('internal-ip': intip())
-  h.merge!('hostname': hostname())
-  return h.to_json
+  return infoInstApiHandler()
 end
 
 def apiSetKey(inputJson)
@@ -164,7 +157,7 @@ begin
   when 'infoInst'
     puts apiInfoInst()
   when 'inetStat'
-    puts apiInetstat()
+    puts apiInetStat()
   when 'extIp'
     puts apiExtIp()
   when 'intIp'
