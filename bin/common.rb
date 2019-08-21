@@ -30,3 +30,23 @@ def outputTable(title, tableData)
   table = Terminal::Table.new :title => title, :rows => tableData
   return table
 end
+
+#def checkUserGroup(user)
+#  response = Open3.capture3('groups #{user}')
+#  if response[2].success? 
+#    groups = response[0].slice(response[0].index(":")..1)
+#    return groups
+#  else
+#    return false
+#  end
+#end
+
+def flsh()
+  pid = spawn('/opt/flight/bin/flight shell')
+  begin
+    Process.wait pid
+  rescue Interrupt
+    Process.kill('INT', pid)
+    retry
+  end
+end

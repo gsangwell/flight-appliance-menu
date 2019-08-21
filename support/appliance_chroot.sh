@@ -26,13 +26,19 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
+branch=$1
+
 yum -y -e0 install patch autoconf automake bison bzip2 gcc-c++ libffi-devel libtool \
-patch readline-devel ruby sqlite-devel zlib-devel glibc-headers glibc-devel openssl-devel make unzip wget
+patch readline-devel ruby sqlite-devel zlib-devel glibc-headers glibc-devel openssl-devel make unzip wget git
+
+if [ -z $branch ] ; then
+  branch='master'
+fi
 
 cd /opt
-wget https://github.com/alces-software/flight-appliance-menu/archive/master.zip
-unzip master.zip
-mv flight-appliance-menu-master appliance
+git clone https://github.com/alces-software/flight-appliance-menu.git
+git checkout $branch
+mv flight-appliance-menu appliance
 cd -
 
 . /etc/profile

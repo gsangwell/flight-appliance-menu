@@ -26,7 +26,7 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-trap('INT') { puts "Quitting..."; exit }
+#trap('INT') { puts "Quitting..."; exit }
 
 ascprint = Artii::Base.new :font => 'slant'
 welcome = ascprint.asciify('Alces Appliance')
@@ -39,10 +39,11 @@ def mainmenu()
   sel = $prompt.select('What would you like to do?') do |menu|
     menu.choice 'View System Information', 'info'
     menu.choice 'User Management', 'uman'
+    menu.choice "Flight Management Console", 'flsh'
     menu.choice 'Enable Alces Engineering Mode', 'engmode'
     menu.choice 'View and Configure Clusters', 'cluster'
-    menu.choice 'Shutdown Alces Appliance', 'shutdown'
     menu.choice 'Quit Alces Engineering Menu', 'getout'
+    menu.choice 'Shutdown Alces Appliance', 'shutdown'
   end
   return sel
 end
@@ -60,6 +61,8 @@ def main()
       infomenu()
     when 'uman'
       usermanager()
+    when 'flsh'
+      flsh()      
     when 'engmode'
       engmode()
       puts '' 
