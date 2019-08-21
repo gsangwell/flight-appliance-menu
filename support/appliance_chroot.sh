@@ -35,11 +35,13 @@ if [ -z $branch ] ; then
   branch='master'
 fi
 
-cd /opt
+pushd /opt
 git clone https://github.com/alces-software/flight-appliance-menu.git
+cd flight-appliance-menu 
 git checkout $branch
+cd ..
 mv flight-appliance-menu appliance
-cd -
+popd
 
 . /etc/profile
 
