@@ -76,3 +76,13 @@ cat << EOF > /etc/sudoers.d/10-alces-appliance
 Cmnd_Alias OPS = /sbin/usermod engineer --shell /bin/bash,/sbin/dmidecode,/sbin/usermod engineer --shell /sbin/nologin,/bin/at now + 1 hour -f /tmp/disable.sh,/sbin/useradd,/sbin/lid,/sbin/shutdown
 %operators      ALL = NOPASSWD: OPS
 EOF
+
+### Install Flight Runway
+
+pushd /etc/yum.repos.d
+wget https://openflighthpc.s3-eu-west-1.amazonaws.com/repos/openflight/openflight.repo
+yum -y -e0 makecache
+yum -y -e0 install flight-runway
+popd
+
+
