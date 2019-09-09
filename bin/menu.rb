@@ -41,7 +41,7 @@ def mainmenu()
     menu.choice 'User Management', 'uman'
     menu.choice "Flight Management Console", 'flsh'
     menu.choice 'Enable Alces Engineering Mode', 'engmode'
-    menu.choice 'View and Configure Clusters', 'cluster'
+    menu.choice 'View and Configure Client VPNs', 'client'
     menu.choice 'Quit Alces Engineering Menu', 'getout'
     menu.choice 'Shutdown Alces Appliance', 'shutdown'
   end
@@ -74,8 +74,8 @@ def main()
       shutdown()
     when 'getout'
       getout()
-    when 'cluster'
-      cluster()
+    when 'client'
+      client()
     else
       puts 'invalid'
     end

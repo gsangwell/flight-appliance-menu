@@ -106,3 +106,20 @@ def setUserSSHKey(uname, key)
     return false
   end
 end
+
+def deleteUser(user)
+  Open3.capture3("\/sbin\/userdel -f #{user}")
+end
+
+def deleteUserHandler(user)
+  begin
+    deleteUserStatus = deleteUser(user)
+    if deleteUserStatus[2].success?
+      return true
+    else
+      return false
+    end
+  rescue 
+    raise StandardError
+  end
+end

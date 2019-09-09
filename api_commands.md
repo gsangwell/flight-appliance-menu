@@ -201,3 +201,68 @@ None
 |-----------|-------------------|--------------------------------------|
 | users     | array of `string` | Array of user-name with system UIDs. |
 
+#### `userSetPasswd`
+
+```
+# ./api.rb userSetPasswd '{"user-name":"bob","passwd":"mYsECurEPAsSW0rD!"}'
+{
+  "user-name":"bob","status":true
+}
+```
+#### Arguments
+
+| Attribute | Type     | Description                          |
+|-----------|----------|--------------------------------------|
+| user-name | `string` | System user to set new password for. |
+| password  | `string` | Crypted password to be set.          |
+
+#### Returns
+
+| Attribute | Type      | Description                                                                                   |
+|-----------|-----------|-----------------------------------------------------------------------------------------------|
+| user-name | `string`  | System user that new password was set for - optional, only if command completed successfully. |
+| status    | `boolean` | `true` If command completed successfully, `false` if command failed.                          |
+
+#### `userDelete`
+
+```
+# ./api.rb userDelete '{"user-name":"bob","delete":true}'
+{
+  "user-name":"bob","status":true
+}
+```
+
+#### Arguments
+
+| Attribute | Type      | Description                          |
+|-----------|-----------|--------------------------------------|
+| user-name | `string`  | System user to be deleted.           |
+| delete    | `boolean` | `true` to confirm password deletion. |
+
+#### Returns
+
+| Attribute | Type      | Description                                                                      |
+|-----------|-----------|----------------------------------------------------------------------------------|
+| user-name | `string`  | System user that was deleted - optional, only if command completed successfully. |
+| status    | `boolean` | `true` If command completed successfully, `false` if command failed.             |
+
+#### `shutdown`
+
+```
+# ./api.rb shutdown '{"shutdown":true}'
+{
+  "status":true
+}
+```
+#### Arguments
+
+| Attribute | Type      | Description                                                          |
+|-----------|-----------|----------------------------------------------------------------------|
+| shutdown  | `boolean` | `true` to confirm shutdown.                                          |
+
+
+#### Returns
+
+| Attribute | Type      | Description                                                          |
+|-----------|-----------|----------------------------------------------------------------------|
+| status    | `boolean` | `true` If command completed successfully, `false` if command failed. |

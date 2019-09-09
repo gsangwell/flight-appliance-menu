@@ -127,7 +127,65 @@ def apiCreateUser(inputJson)
   else
     return {'user-name' => uname, 'status' => false, 'stdout' => response[0], 'stderr' => response[1]}
   end
+end
+
+def apiUserSetPasswd(inputJson)
+  begin
+    hash = JSON.parse(inputJson)
+  rescue
+    return {'status' => false} 
+  end 
+  if ! hash['user-name'].nil? && ! hash['passwd'].nil?
+    uname = hash['user-name']
+    cryptedPasswd = hash['passwd']
+  else 
+    return {'user-name' => uname, 'status' => false}
+  end
+  begin
+    if setPasswd(uname, cryptedPasswd)
+      return {'user-name' => uname, 'status' => true}
+    else
+      raise StandardError
+    end
+  rescue 
+    return {'user-name' => uname, 'status' => false} 
+  end
+end
+
+def apiUserDelete(inputJson)
+  begin
+    hash = JSON.parse(inputJson)
+  rescue
+    return {'status' => false} 
+  end 
+  if ! hash['user-name'].nil?
+    begin
+      uname = hash['user-name'] 
+      if deleteUserHandler(uname)
+        return {'user-name' => uname, 'status' => true} 
+      else
+        raise StandardError
+      end
+    rescue
+      return {'user-name' => uname, 'status' => false}
+    end
+  end
+end
     
+
+ 
+def apiShutdown(inputJson)
+  begin
+    hash = JSON.parse(inputJson)
+  rescue
+    return {'status' => false} 
+  end
+  if hash['shutdown'].is_a? TrueClass
+    return {'status' => true}
+    shutdown()
+  else
+    return {'status' => false}
+  end
 end
 
 def apiHelp()
@@ -145,7 +203,10 @@ def apiHelp()
     - userCreate - Create a user - requires '{"user-name":"<System username>","full-name":"<User's full name>"}'
     - userSetKey - Set SSH key for a system user - requires '{"user-name":"<System username>","key":"<SSH Key to be used>"}'
     - userGetList - Return list of system users.
-
+    - userSetPasswd - Set the user's password - requires '{"user-name":"<System username>","passwd":"<User's password>"}'
+    - userDelete - Delete a user from the system - requires '{"user-name":"<System username>","delete":true}'
+    - shutdown - Shut down the instance - requires '{"shutdown":true}'
+    - 
 
   HEREDOC
 end
@@ -174,11 +235,16 @@ begin
     puts apiSetKey(ARGV[1]).to_json
   when 'userGetList'
     puts apiGetUserList()
+  when 'userSetPasswd'
+    puts apiUserSetPasswd(ARGV[1]).to_json
+  when 'userDelete'
+    puts apiUserDelete(ARGV[1]).to_json
+  when 'shutdown'
+    puts apiShutdown()
   when 'help'
     puts apiHelp()
   else
     puts "Invalid Command - use help for a list of requests"
   end
 
-  
 end

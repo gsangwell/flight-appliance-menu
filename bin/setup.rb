@@ -28,6 +28,7 @@
 
 require 'tty'
 require 'tty-prompt'
+require 'tty-spinner'
 require 'artii'
 require 'net/http'
 require 'net/ping'
@@ -36,6 +37,8 @@ require 'terminal-table'
 require 'yaml'
 require 'json'
 require 'open3'
+require 'fileutils'
+require 'erb'
 
 require 'common'
 require 'userman'
@@ -43,7 +46,6 @@ require 'engmode'
 require 'info'
 require 'shutdown'
 require 'cluster'
-require 'fileutils'
 
 def setup()
   bios = `sudo /usr/sbin/dmidecode -s bios-version | /bin/tr "[:upper:]" "[:lower:]" | /bin/grep "amazon"`

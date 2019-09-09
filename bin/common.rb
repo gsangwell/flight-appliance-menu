@@ -26,8 +26,10 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-def outputTable(title, tableData)
-  table = Terminal::Table.new :title => title, :rows => tableData
+$spinner = TTY::Spinner.new(interval: 20)
+
+def outputTable(title, tableData, *headerData)
+  table = Terminal::Table.new :title => title, :rows => tableData, :headings => headerData
   return table
 end
 
@@ -50,3 +52,10 @@ def flsh()
     retry
   end
 end
+
+def writeHashToYaml(hash,filepath)
+  File.open(filepath,"w") do |f|
+    f.write hash.to_yaml
+  end
+end
+
