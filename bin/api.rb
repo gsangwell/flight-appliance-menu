@@ -188,6 +188,21 @@ def apiShutdown(inputJson)
   end
 end
 
+ 
+def apiReboot(inputJson)
+  begin
+    hash = JSON.parse(inputJson)
+  rescue
+    return {'status' => false} 
+  end
+  if hash['reboot'].is_a? TrueClass
+    return {'status' => true}
+    reboot()
+  else
+    return {'status' => false}
+  end
+end
+
 def apiHelp()
   <<~HEREDOC
 
@@ -206,7 +221,7 @@ def apiHelp()
     - userSetPasswd - Set the user's password - requires '{"user-name":"<System username>","passwd":"<User's password>"}'
     - userDelete - Delete a user from the system - requires '{"user-name":"<System username>","delete":true}'
     - shutdown - Shut down the instance - requires '{"shutdown":true}'
-    - 
+    - reboot - Restart the instance - requires '{"restart":true}' 
 
   HEREDOC
 end
@@ -240,7 +255,9 @@ begin
   when 'userDelete'
     puts apiUserDelete(ARGV[1]).to_json
   when 'shutdown'
-    puts apiShutdown()
+    puts apiShutdown(ARGV[1]).to_json
+  when 'reboot'
+    puts apiReboot(ARGV[1]).to_json
   when 'help'
     puts apiHelp()
   else

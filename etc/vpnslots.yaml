@@ -8,71 +8,9 @@ slots:
     password: 
     clientscript: 
   vpn2:
-    configured: true
-    clientname: sitecluster
+    configured: false
+    clientname: 
     clientip: 10.178.0.9
     serverip: 10.178.0.10
-    password: "$1$0BtbpQEo$bmRGT8LhNxcGddH8xbAr./"
-    clientscript: |-
-      #!/bin/bash
-
-
-      yum install epel-release -y
-      yum install openvpn -y
-
-      cat << EOF > /etc/openvpn/flighthub.conf
-      client
-      dev tun0
-      proto tcp
-      remote 51.145.24.34 1195
-      resolv-retry infinite
-      nobind
-      persist-key
-      persist-tun
-      <ca>
-      -----BEGIN CERTIFICATE-----
-      MIIE3TCCA8WgAwIBAgIJAJiw/hh6yqocMA0GCSqGSIb3DQEBCwUAMIGgMQswCQYD
-      VQQGEwJVSzEUMBIGA1UECAwLT3hmb3Jkc2hpcmUxDzANBgNVBAcMBk94Zm9yZDEZ
-      MBcGA1UECgwQQWxjZXMgRmxpZ2h0IEx0ZDEXMBUGA1UECwwOSW5mcmFzdHJ1Y3R1
-      cmUxETAPBgNVBAMMCENoYW5nZU1lMSMwIQYJKoZIhvcNAQkBFhRzc2xAYWxjZXMt
-      ZmxpZ2h0LmNvbTAeFw0xOTA4MjgxNjIwMzRaFw0yOTA4MjUxNjIwMzRaMIGgMQsw
-      CQYDVQQGEwJVSzEUMBIGA1UECAwLT3hmb3Jkc2hpcmUxDzANBgNVBAcMBk94Zm9y
-      ZDEZMBcGA1UECgwQQWxjZXMgRmxpZ2h0IEx0ZDEXMBUGA1UECwwOSW5mcmFzdHJ1
-      Y3R1cmUxETAPBgNVBAMMCENoYW5nZU1lMSMwIQYJKoZIhvcNAQkBFhRzc2xAYWxj
-      ZXMtZmxpZ2h0LmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAN2R
-      yIpo+1hksHOGdjNggfBLSfnqnVIfvK7WFukqEv22ioY5GRmm+JKI++tqWk2iwh1y
-      VHT53HAF3yFFeUD3pLyumSQic7pxPq8FLEWfAGL/nHsdL8mU8fY+rYp3vfBjnk7w
-      X4tx67f7ofshwn2hjJdEyJgeIoL0vg5SZxxbDJAmLUzsVsrv5YwWnA89OXp8tMuC
-      VJvM4SUZ0AzXGepQ6nt5SrIKJtyHn5LgUcFuMM9+7Wy9fmcEE9ktKHX9a3NQjM/+
-      lFBZ0/wKXnXAM+f9kklbUJil2Rsmbwhn+qA6hk+DitgA0TCvhfZECxolzSxGh+Uv
-      uQ+TJxUglJkpMO0lvlcCAwEAAaOCARYwggESMB0GA1UdDgQWBBTlcU5KC6bxro6f
-      2bg1z1zZf3Cd0DCB1QYDVR0jBIHNMIHKgBTlcU5KC6bxro6f2bg1z1zZf3Cd0KGB
-      pqSBozCBoDELMAkGA1UEBhMCVUsxFDASBgNVBAgMC094Zm9yZHNoaXJlMQ8wDQYD
-      VQQHDAZPeGZvcmQxGTAXBgNVBAoMEEFsY2VzIEZsaWdodCBMdGQxFzAVBgNVBAsM
-      DkluZnJhc3RydWN0dXJlMREwDwYDVQQDDAhDaGFuZ2VNZTEjMCEGCSqGSIb3DQEJ
-      ARYUc3NsQGFsY2VzLWZsaWdodC5jb22CCQCYsP4YesqqHDAMBgNVHRMEBTADAQH/
-      MAsGA1UdDwQEAwIBBjANBgkqhkiG9w0BAQsFAAOCAQEAADF5OghuOZJn/f1hSgOA
-      HfWjZuh30oFe2z5hcAIjc+VFiGNxlkU/N9jWkmGh2sZH7inB6OVGRluZ7E1kgF+w
-      JpF3eBrDUWN6ejBfYzHbuqXjlrqhQLBxElg3lVnqE8MYYgvCxQ3JVVJEVeckUGY/
-      qrJGgO011/z+280IeBSYi3kiXCkEPcXlGwn5mj5X5H5lI9+q50z9nFSF3Ta62L1A
-      1gbHPiLxvP5Yek6GtIJkqUXa0f5hmfYcPLRPiQ03qJxGU9nwPMAmwgCjpNtCERkK
-      5G23v7OUeWD4qY8PblmDh7zDlgOesWSbnmGSFr17BxvGQGqZNPKNRjsURiqPBglA
-      VQ==
-      -----END CERTIFICATE-----
-
-      </ca>
-      auth-user-pass auth.flighthub
-      ns-cert-type server
-      comp-lzo
-      verb 3
-      EOF
-
-      echo -n "Enter your FlightHub password: "; read PASSWORD
-      cat << EOF > /etc/openvpn/auth.flighthub
-      sitecluster
-      ${PASSWORD}
-      EOF
-
-      chmod 600 /etc/openvpn/auth.flighthub
-
-      systemctl start openvpn@flighthub
+    password: 
+    clientscript: 

@@ -105,7 +105,11 @@ def assignSlot()
   File.open("/etc/openvpn/ccd-cluster/#{clientName}", 'w') do |l|
     l.puts("ifconfig-push #{slotHash[vpnSlot]['clientip']} #{slotHash[vpnSlot]['serverip']}")
   end
-  userCreateStatus = Open3.capture3("\/sbin\/useradd -M -N -s \/sbin\/nologin #{clientName}")
+  if ! Open3.capture3("\/sbin\/useradd -M -N -s \/sbin\/nologin #{clientName} --gid vpn")[2].success?
+    puts "Could not create user"
+    client()
+  end
+  puts userCreateStatus
   rawPasswd = checkPasswd()
   cryptedPasswd = genPasswd(rawPasswd)
   setPasswd(clientName,cryptedPasswd)
@@ -203,8 +207,13 @@ def deconfigureVPNClient(deconfVPN)
 end
 
 def promptDeconfigureVPNClientAssignment()
-  deconfVPN = $prompt.select("Choose a VPN Slot to Deconfigure: ", slotListUsed.keys.to_a)
-  deconfigureVPNClient(deconfVPN)
+  if slotListUsed.keys.empty?
+    puts "No configured clusters"
+    clientMenu()
+  else
+    deconfVPN = $prompt.select("Choose a VPN Slot to Deconfigure: ", slotListUsed.keys.to_a)
+    deconfigureVPNClient(deconfVPN)
+  end
 end
 
 def editClientAssignment()

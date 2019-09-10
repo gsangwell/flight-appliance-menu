@@ -29,3 +29,7 @@
 def shutdown()
   system('sudo shutdown -h 1')
 end
+
+def reboot()
+  system('sudo shutdown -r 1')
+end

@@ -57,6 +57,7 @@ cd /opt/appliance
 
 groupadd engineers
 groupadd operators
+groupadd vpn
 useradd engineer -G engineers -G operators
 useradd alces-operator -G operators
 usermod alces-operator --shell /opt/appliance/bin/cli.rb
