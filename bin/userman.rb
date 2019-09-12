@@ -48,7 +48,11 @@ def usermenu()
 end
 
 def getUserList()
-  return `sudo lid -g operators`.split
+  userlist = `sudo lid -g operators`.split
+  userlist.each_with_index do |e,i|
+    userlist[i] = e.gsub(/\(.*\)/, '')
+  end
+  return userlist 
 end
 
 def viewusers()
