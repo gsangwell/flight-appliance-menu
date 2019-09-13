@@ -300,7 +300,7 @@ def printVPNClientScript()
   if ! vpnSlot.nil?
     script = getVPNClientScript(vpnSlot)
     if ! script.nil?
-      return script
+      puts script
     else
       puts "No VPNs assigned"
     end
