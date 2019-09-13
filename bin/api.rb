@@ -230,9 +230,9 @@ end
 def apiVpnAssign(inputJson)
   begin
     hash = JSON.parse(inputJson)
-    if ! hash['vpnslot'].nil? && ! hash['clientname'].nil?
+    if ! hash['vpn'].nil? && ! hash['clientname'].nil?
       clientname = hash['clientname']
-      vpnslot = hash['vpnslot']
+      vpnslot = hash['vpn']
       if assignSlot(clientname,vpnslot)
         return {'status' => true} 
       else 
@@ -329,10 +329,10 @@ def apiHelp()
     - userDelete - Delete a user from the system - requires '{"user-name":"<System username>","delete":true}'
     - vpnStatus - View VPN connection status
     - vpnSlotsAvail - View VPN slots that are not yet configured
-    - vpnAssign - Assign VPN slot to client
-    - vpnViewClientScript - View the connection script for a client
-    - vpnGeneratePassword - Generate password for client
-    - vpnDeconfigure - Deconfigure VPN slot assoicated to a client
+    - vpnAssign - Assign VPN slot to client - requires '{"vpnslot":"<available-vpn-slot>","clientname":"<clientname>"}' 
+    - vpnViewClientScript - View the connection script for a client '{"vpnslot":"<assigned-vpn-slot>"}' 
+    - vpnGeneratePassword - Generate password for client '{"vpnslot":"<available-vpn-slot>"}' 
+    - vpnDeconfigure - Deconfigure VPN slot assoicated to a client '{"vpnslot":"<available-vpn-slot>","deconfigure":true}' 
     - shutdown - Shut down the instance - requires '{"shutdown":true}'
     - reboot - Restart the instance - requires '{"restart":true}' 
 
