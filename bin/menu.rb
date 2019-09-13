@@ -43,8 +43,9 @@ def mainmenu()
     menu.choice 'Enable Alces Engineering Mode', 'engmode'
     menu.choice 'View and Configure Client VPNs', 'client'
     menu.choice 'Quit Alces Engineering Menu', 'getout'
+    menu.choice 'Reboot Alces Appliance', 'reboot'
     menu.choice 'Shutdown Alces Appliance', 'shutdown'
-  end
+   end
   return sel
 end
 
@@ -72,6 +73,8 @@ def main()
       puts ''
     when 'shutdown'
       shutdown()
+    when 'reboot'
+      reboot()
     when 'getout'
       getout()
     when 'client'

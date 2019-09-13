@@ -51,7 +51,7 @@ def usermenu()
 end
 
 def promptUserPasswd()
-  user = $prompt.ask("User: ", required:true)
+  user = $prompt.select("Change Password - Choose a user: ", getUserList())
   password = checkPasswd()
   status = Open3.capture3("echo '#{password}' | sudo \/bin\/passwd #{user} --stdin")
   if status[2].success?
