@@ -26,14 +26,22 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-yum -y -e0 install patch autoconf automake bison bzip2 gcc-c++ libffi-devel libtool \
-patch readline-devel ruby sqlite-devel zlib-devel glibc-headers glibc-devel openssl-devel make unzip wget
+branch=$1
 
-cd /opt
-wget https://github.com/alces-software/flight-appliance-menu/archive/master.zip
-unzip master.zip
-mv flight-appliance-menu-master appliance
-cd -
+yum -y -e0 install patch autoconf automake bison bzip2 gcc-c++ libffi-devel libtool \
+patch readline-devel ruby sqlite-devel zlib-devel glibc-headers glibc-devel openssl-devel make unzip wget git
+
+if [ -z $branch ] ; then
+  branch='master'
+fi
+
+pushd /opt
+git clone https://github.com/alces-software/flight-appliance-menu.git
+cd flight-appliance-menu 
+git checkout $branch
+cd ..
+mv flight-appliance-menu appliance
+popd
 
 . /etc/profile
 
@@ -49,6 +57,7 @@ cd /opt/appliance
 
 groupadd engineers
 groupadd operators
+groupadd vpn
 useradd engineer -G engineers -G operators
 useradd alces-operator -G operators
 usermod alces-operator --shell /opt/appliance/bin/cli.rb
@@ -65,6 +74,17 @@ EOF
 
 touch /etc/sudoers.d/10-alces-appliance
 cat << EOF > /etc/sudoers.d/10-alces-appliance
-Cmnd_Alias OPS = /sbin/usermod engineer --shell /bin/bash,/sbin/dmidecode,/sbin/usermod engineer --shell /sbin/nologin,/bin/at now + 1 hour -f /tmp/disable.sh,/sbin/useradd,/sbin/lid,/sbin/shutdown
+Cmnd_Alias OPS = /sbin/usermod engineer --shell /bin/bash,/sbin/dmidecode,/sbin/usermod engineer --shell /sbin/nologin,/bin/at now + 1 hour -f /tmp/disable.sh,/sbin/useradd,/sbin/lid,/sbin/shutdown,/bin/passwd
 %operators      ALL = NOPASSWD: OPS
 EOF
+
+### Install Flight Runway
+
+pushd /etc/yum.repos.d
+wget https://openflighthpc.s3-eu-west-1.amazonaws.com/repos/openflight/openflight.repo
+yum -y -e0 makecache
+yum -y -e0 install flight-runway
+yum -y -e0 install flight-cloud-client
+popd
+
+

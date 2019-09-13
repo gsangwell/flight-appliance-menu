@@ -44,6 +44,6 @@ setup()
 begin
   require 'menu'
   main()
-rescue Interrupt,TTY::Reader::InputInterrupt
+rescue Interrupt,TTY::Reader::InputInterrupt 
   puts "\n Quitting..."
 end

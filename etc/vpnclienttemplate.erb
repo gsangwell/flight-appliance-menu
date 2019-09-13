@@ -1,0 +1,33 @@
+#!/bin/bash
+
+
+yum install epel-release -y
+yum install openvpn -y
+
+cat << EOF > /etc/openvpn/flighthub.conf
+client
+dev tun0
+proto tcp
+remote <%= extIp().sub("\n","") %> 1195
+resolv-retry infinite
+nobind
+persist-key
+persist-tun
+<ca>
+<%= caCrt() %>
+</ca>
+auth-user-pass auth.flighthub
+ns-cert-type server
+comp-lzo
+verb 3
+EOF
+
+echo -n "Enter your FlightHub password: "; read PASSWORD
+cat << EOF > /etc/openvpn/auth.flighthub
+<%= @clientName %>
+${PASSWORD}
+EOF
+
+chmod 600 /etc/openvpn/auth.flighthub
+
+systemctl start openvpn@flighthub

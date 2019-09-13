@@ -32,6 +32,8 @@ def usermanager()
     puts viewusers()
   when 'newuser'
     newUser()
+  when 'upasswd'
+    promptUserPasswd()
   when 'getout'
     main()
   end
@@ -42,13 +44,45 @@ def usermenu()
     menu.choice 'View System Users', 'viewusers'
     menu.choice 'Create System User', 'newuser'
     menu.choice 'Update Keys for Users', 'sshkey'
+    menu.choice 'Change Password for User', 'upasswd'
     menu.choice 'Return', 'getout'
   end
   return sel
 end
 
+def promptUserPasswd()
+  user = $prompt.select("Change Password - Choose a user: ", getUserList())
+  password = checkPasswd()
+  status = Open3.capture3("echo '#{password}' | sudo \/bin\/passwd #{user} --stdin")
+  if status[2].success?
+    puts "Success"
+  else
+    puts status
+    puts "Fail"
+  end
+end
+
+def promptPasswd()
+  rawPasswd1 = $prompt.mask("Enter a password: ")
+  rawPasswd2 = $prompt.mask("Confirm the password: ")
+  rawPasswds = [rawPasswd1,rawPasswd2]
+end
+
+def checkPasswd()
+  rawPasswds = promptPasswd()
+  while rawPasswds[0] != rawPasswds[1]
+    puts "Passwords do not match - try again"
+    rawPasswds = promptPasswd() 
+  end
+  return rawPasswds[0] 
+end
+
 def getUserList()
-  return `sudo lid -g operators`.split
+  userlist = `sudo lid -g operators`.split
+  userlist.each_with_index do |e,i|
+    userlist[i] = e.gsub(/\(.*\)/, '')
+  end
+  return userlist 
 end
 
 def viewusers()
@@ -104,5 +138,22 @@ def setUserSSHKey(uname, key)
     return true 
   rescue
     return false
+  end
+end
+
+def deleteUser(user)
+  Open3.capture3("\/sbin\/userdel -f #{user}")
+end
+
+def deleteUserHandler(user)
+  begin
+    deleteUserStatus = deleteUser(user)
+    if deleteUserStatus[2].success?
+      return true
+    else
+      return false
+    end
+  rescue 
+    raise StandardError
   end
 end

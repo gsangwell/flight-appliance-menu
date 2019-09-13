@@ -27,6 +27,9 @@
 #==============================================================================
 
 def shutdown()
-  puts "shutting down..."
-  system('sudo shutdown -h now')
+  system('sudo shutdown -h 1')
+end
+
+def reboot()
+  system('sudo shutdown -r 1')
 end

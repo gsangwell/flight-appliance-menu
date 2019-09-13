@@ -36,21 +36,21 @@ def infomenu()
   end
   case sel
   when 'infoinst'
-    puts infoinst()
+    puts infoInst()
   when 'inetstat'
-    puts inetstat()
+    puts inetStat()
   when 'extip'
     puts ''
-    ip = extip()
+    ip = extIp()
     puts 'External IP Address: ' + ip
   when 'ret'
     main()
   end
 end
 
-def inetstat_table_generate()
+def inetStatTableGenerate()
   table = []
-  table << ['Ping 8.8.8.8? ', pingip()]
+  table << ['Ping 8.8.8.8? ', pingIp()]
   table << ['Resolve alces-software.com? ', resolv('alces-software.com')]
   table << ['Default Gateway', gw()]
   table << ['Primary DNS Server', dns('nameserver').first]
@@ -60,12 +60,12 @@ def inetstat_table_generate()
   return ary
 end
 
-def inetstat()
-  inetstat_table = inetstat_table_generate()
-  puts outputTable(inetstat_table[0], inetstat_table[1])
+def inetStat()
+  inetStatTable = inetStatTableGenerate()
+  puts outputTable(inetStatTable[0], inetStatTable[1])
 end
 
-def pingip_test()
+def pingIpTest()
   begin
     Net::Ping::External.new("8.8.8.8").ping?
     return true
@@ -74,8 +74,8 @@ def pingip_test()
   end
 end
 
-def pingip()
-  if pingip_test()
+def pingIp()
+  if pingIpTest()
     return "Responding"
   else
     return "Not Responding"
