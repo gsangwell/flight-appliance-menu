@@ -84,6 +84,7 @@ pushd /etc/yum.repos.d
 wget https://openflighthpc.s3-eu-west-1.amazonaws.com/repos/openflight/openflight.repo
 yum -y -e0 makecache
 yum -y -e0 install flight-runway
+yum -y -e0 install flight-cloud-client
 popd
 
 
