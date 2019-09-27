@@ -29,7 +29,7 @@
 #trap('INT') { puts "Quitting..."; exit }
 
 ascprint = Artii::Base.new :font => 'slant'
-welcome = ascprint.asciify('Alces Appliance')
+welcome = ascprint.asciify('Alces Hub')
 puts welcome
 
 
@@ -40,11 +40,11 @@ def mainmenu()
     menu.choice 'View System Information', 'info'
     menu.choice 'User Management', 'uman'
     menu.choice "Flight Management Console", 'flsh'
-    menu.choice 'Enable Alces Engineering Mode', 'engmode'
+    menu.choice 'Enable Remote Assistance', 'engmode'
     menu.choice 'View and Configure Client VPNs', 'client'
-    menu.choice 'Quit Alces Engineering Menu', 'getout'
-    menu.choice 'Reboot Alces Appliance', 'reboot'
-    menu.choice 'Shutdown Alces Appliance', 'shutdown'
+    menu.choice 'Exit menu', 'getout'
+    menu.choice 'Reboot Alces Hub', 'reboot'
+    menu.choice 'Shutdown Alces Hub', 'shutdown'
    end
   return sel
 end
