@@ -26,6 +26,12 @@ wget https://openflighthpc.s3-eu-west-1.amazonaws.com/repos/openflight-dev/openf
 yum -y makecache
 yum -y install flight-appliance-menu
 
+cat << EOF > /opt/flight/opt/appliance/bin/shell
+#!/bin/bash
+/opt/flight/bin/flight appliance
+EOF
+chmod +x /opt/flight/opt/appliance/bin/shell
+
 ########Users and groups for appliance ############
 groupadd engineers
 groupadd operators
@@ -49,8 +55,7 @@ system_info:
     gecos: Default Appliance User
     groups: [wheel, adm, systemd-journal, operators]
     sudo: ["ALL=(ALL) NOPASSWD:ALL"]
-    #shell: /opt/appliance/bin/cli.rb
-    shell: /bin/bash
+    shell: /opt/flight/opt/appliance/bin/shell
 EOF
 
 #operator sudo rule to allow system commands
