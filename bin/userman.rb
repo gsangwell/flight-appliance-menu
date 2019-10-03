@@ -110,7 +110,7 @@ def newUser()
 end
 
 def createUser(uname,fname)
-  Open3.capture3("sudo \/sbin\/useradd #{uname} -G operators --comment \"#{fname}\" --shell /opt/appliance/bin/cli.rb")
+  Open3.capture3("sudo \/sbin\/useradd #{uname} -G operators --comment \"#{fname}\" --shell #{$app_root}/bin/flightusershell.rb")
 end
 
 def getKey()
