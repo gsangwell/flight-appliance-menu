@@ -22,17 +22,9 @@ yum -y install flight-runway
 yum -y install flight-cloud-client
 
 ########Install menu system##############
-git clone https://github.com/alces-software/flight-appliance-menu.git -b $FLIGHT_APPLIANCE_MENU_BRANCH /opt/appliance
-
-wget https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.3.tar.gz -O /tmp/ruby-2.6.3.tar.gz
-cd /tmp
-tar -zxvf ruby-2.6.3.tar.gz
-cd ruby-2.6.3
-./configure --prefix /opt/appliance/ruby-2.6.3
-make -j4
-make install
-cd /opt/appliance
-/opt/appliance/ruby-2.6.3/bin/bundle install --path vendor
+wget https://openflighthpc.s3-eu-west-1.amazonaws.com/repos/openflight-dev/openflight-dev.repo -O /etc/yum.repos.d/openflight-dev.repo
+yum -y makecache
+yum -y install flight-appliance-menu
 
 ########Users and groups for appliance ############
 groupadd engineers
@@ -57,7 +49,8 @@ system_info:
     gecos: Default Appliance User
     groups: [wheel, adm, systemd-journal, operators]
     sudo: ["ALL=(ALL) NOPASSWD:ALL"]
-    shell: /opt/appliance/bin/cli.rb
+    #shell: /opt/appliance/bin/cli.rb
+    shell: /bin/bash
 EOF
 
 #operator sudo rule to allow system commands
