@@ -56,8 +56,7 @@ system_info:
     gecos: Default Appliance User
     groups: [wheel, adm, systemd-journal, operators]
     sudo: ["ALL=(ALL) NOPASSWD:ALL"]
-#    shell: /opt/flight/opt/appliance/bin/shell
-    shell: /bin/bash
+    shell: /opt/flight/opt/appliance/bin/shell
 EOF
 
 #operator sudo rule to allow system commands
