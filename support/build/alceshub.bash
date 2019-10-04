@@ -16,13 +16,14 @@ yum -y install epel-release
 yum -y install openvpn easy-rsa bind-utils
 
 #########Install flight runway & related tools#########
-wget https://openflighthpc.s3-eu-west-1.amazonaws.com/repos/openflight/openflight.repo -O /etc/yum.repos.d/openflight.repo
+yum install -y -e0 https://openflighthpc.s3-eu-west-1.amazonaws.com/repos/openflight/x86_64/openflighthpc-release-1-1.noarch.rpm
+yum install -y -e0 https://alces-flight.s3-eu-west-1.amazonaws.com/repos/alces-flight/x86_64/alces-flight-release-1-1.noarch.rpm
 yum -y makecache
 yum -y install flight-runway
 yum -y install flight-cloud-client
 
-########Install menu system##############
-wget https://openflighthpc.s3-eu-west-1.amazonaws.com/repos/openflight-dev/openflight-dev.repo -O /etc/yum.repos.d/openflight-dev.repo
+########Install menu system#############
+yum-config-manager --enable alces-flight-dev
 yum -y makecache
 yum -y install flight-appliance-menu
 
@@ -55,7 +56,8 @@ system_info:
     gecos: Default Appliance User
     groups: [wheel, adm, systemd-journal, operators]
     sudo: ["ALL=(ALL) NOPASSWD:ALL"]
-    shell: /opt/flight/opt/appliance/bin/shell
+#    shell: /opt/flight/opt/appliance/bin/shell
+    shell: /bin/bash
 EOF
 
 #operator sudo rule to allow system commands
