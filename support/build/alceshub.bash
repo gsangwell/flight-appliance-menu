@@ -258,11 +258,13 @@ ln -snf /opt/appliance/bin/cli.rb /usr/bin/alces-appliance
 mkdir -p  /var/lib/firstrun/scripts/
 cat << EOF > /var/lib/firstrun/scripts/appliancegui.bash
 cd /appliance/flighthub-gui
-. /etc/profile 
+. /etc/profile
+systemctl stop postgresql
+rm -rf /var/lib/pgsql/data
 postgresql-setup initdb
 sed -i 's/peer$/trust/g;s/ident$/trust/g' /var/lib/pgsql/data/pg_hba.conf
 systemctl enable postgresql
-systemctl restart postgresql
+systemctl start postgresql
 
 RAILS_ENV=production bin/rails db:create
 RAILS_ENV=production bin/rails db:schema:load
@@ -299,7 +301,7 @@ chmod 755 /opt/flight/bin/jq
 
 mkdir -p /var/lib/firstrun/scripts/
 cat <<'SSLCERTS' > /var/lib/firstrun/scripts/ssl-certs.bash
-ssl_extip=$(/opt/appliance/bin/api.rb extIp | /opt/flight/bin/jq -r '.["external-ip"]')
+ssl_extip=$(/opt/flight/bin/ruby /opt/flight/opt/appliance/bin/api.rb extIp | /opt/flight/bin/jq -r '.["external-ip"]')
 if /opt/flight/opt/flight-ssl/flight-ssl.sh hub /opt/flight/etc/ssl ${ssl_extip}; then
   ssl_name="$(basename $(echo /opt/flight/etc/ssl/certs-hub-*) | sed 's/^certs-//g')"
   ssl_dom=$(($(date +%d)-3))
