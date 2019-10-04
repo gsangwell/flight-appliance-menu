@@ -55,6 +55,7 @@ def inetStatTableGenerate()
   table << ['Default Gateway', gw()]
   table << ['Primary DNS Server', dns('nameserver').first]
   table << ['Search Domain', dns('search').first]
+  table << ['External URL', extDNS]
   title = "Internet Connectivity Information"
   ary = [title, table]
   return ary
@@ -72,6 +73,11 @@ def pingIpTest()
   rescue
     return false
   end
+end
+
+def extDNS
+  ssl_name=`echo $(basename $(echo /opt/flight/etc/ssl/certs-hub-*) | sed 's/^certs-//g')`.chomp
+  "https://#{ssl_name}.appliance.alces.network"
 end
 
 def pingIp()

@@ -52,6 +52,7 @@ def apiInetStat()
   h.merge!('default-gateway': gw())
   h.merge!('dns-servers': dns('nameserver'))
   h.merge!('search-domain': dns('search'))
+  h.merge!('extURL': extDNS)
   return h.to_json
 end
 
