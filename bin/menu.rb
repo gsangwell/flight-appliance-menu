@@ -42,6 +42,7 @@ def mainmenu()
     menu.choice "Flight Management Console", 'flsh'
     menu.choice 'Enable Remote Assistance', 'engmode'
     menu.choice 'View and Configure Client VPNs', 'client'
+    menu.choice 'Launch console', 'console'
     menu.choice 'Exit menu', 'getout'
     menu.choice 'Reboot Alces Hub', 'reboot'
     menu.choice 'Shutdown Alces Hub', 'shutdown'
@@ -79,6 +80,8 @@ def main()
       getout()
     when 'client'
       client()
+    when 'console'
+      loginsh
     else
       puts 'invalid'
     end
