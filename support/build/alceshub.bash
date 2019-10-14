@@ -1,9 +1,7 @@
 #!/bin/bash -ex
 # Copyright (C) 2019-present Alces Flight Ltd.
 
-if [ -z "${FLIGHT_APPLIANCE_MENU_BRANCH}" ]; then
-  FLIGHT_APPLIANCE_MENU_BRANCH=master
-fi
+#SET DEV=1 to enable build from develop branches
 
 if [ -z "${FLIGHT_GUI_BRANCH}" ]; then
   FLIGHT_GUI_BRANCH=master
@@ -18,13 +16,18 @@ yum -y install openvpn easy-rsa bind-utils
 #########Install flight runway & related tools#########
 yum install -y -e0 https://openflighthpc.s3-eu-west-1.amazonaws.com/repos/openflight/x86_64/openflighthpc-release-1-1.noarch.rpm
 yum install -y -e0 https://alces-flight.s3-eu-west-1.amazonaws.com/repos/alces-flight/x86_64/alces-flight-release-1-1.noarch.rpm
+
 yum -y makecache
+
+if [ $DEV -eq 1 ]; then
+  yum-config-manager --enable alces-flight-dev
+fi
+
 yum -y install flight-runway
 yum -y install flight-cloud-client
 
 ########Install menu system#############
-yum-config-manager --enable alces-flight-dev
-yum -y makecache
+
 yum -y install flight-appliance-menu
 
 cat << EOF > /opt/flight/opt/appliance/bin/shell
@@ -57,6 +60,7 @@ system_info:
     groups: [wheel, adm, systemd-journal, operators]
     sudo: ["ALL=(ALL) NOPASSWD:ALL"]
     shell: /opt/flight/opt/appliance/bin/shell
+    #shell: /bin/bash
 EOF
 
 #operator sudo rule to allow system commands
@@ -260,6 +264,7 @@ ln -snf /opt/appliance/bin/cli.rb /usr/bin/alces-appliance
 mkdir -p  /var/lib/firstrun/scripts/
 cat << EOF > /var/lib/firstrun/scripts/appliancegui.bash
 cd /appliance/flighthub-gui
+export LANG=en_US.UTF-8
 . /etc/profile
 systemctl stop postgresql
 rm -rf /var/lib/pgsql/data
