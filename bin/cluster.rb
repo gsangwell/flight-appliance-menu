@@ -30,6 +30,7 @@ config = YAML.load(File.read(File.expand_path('../../cfg/config.yaml',__FILE__))
 $vpnSlotFilePath = config['vpn']['vpnslotfile']
 $vpnSlotFileConfig = YAML.load(File.read($vpnSlotFilePath))
 $etcConfigPath = config['vpn']['vpnconfigpath']
+$vpnUsersFile = config['vpn']['vpnusersfile']
 
 def clientMenu()  
   sel = $prompt.select('Choose an option') do |menu|
@@ -149,9 +150,17 @@ def assignSlot(clientName,vpnSlot)
       slotHash[vpnSlot]['password'] = '' 
       vpnSlotFileWrite(slotHash)
       reloadSlotFileConfig()
+      writeVPNUsersConf()
     end
   else
     return nil
+  end
+end
+
+def writeVPNUsersConf()
+  users = $vpnSlotFileConfig['slots'].select {|k,v| v['configured']}.map {|k,v| v['clientname']}
+  File.open($vpnUsersFile, "w+") do |f|
+    users.each {|e| f.puts(e)}
   end
 end
 
@@ -222,6 +231,7 @@ def genClientPasswd(vpnSlot)
       slotHash[vpnSlot]['password'] = cryptedPasswd 
       vpnSlotFileWrite(slotHash)
       reloadSlotFileConfig()
+      writeVPNUsersConf()
       return randomRawPass
     end
   rescue
@@ -324,6 +334,7 @@ def deconfigureVPNClient(deconfVPN)
     deleteVPNClientUser(oldUser)
     vpnSlotFileWrite(slotHash)
     reloadSlotFileConfig()
+    writeVPNUsersConf()
     return true
   rescue
     return nil
@@ -367,6 +378,8 @@ def editClientAssignment()
       slotHash[vpnSlot]['clientname'] = newName
       vpnSlotFileWrite(slotHash)
       reloadSlotFileConfig()
+      writeVPNUsersConf()
+
     end 
   else
     puts "No configured VPNs"

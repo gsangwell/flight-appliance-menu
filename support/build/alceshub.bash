@@ -75,6 +75,10 @@ Cmnd_Alias OPS = /sbin/usermod engineer --shell /bin/bash,/sbin/dmidecode,/sbin/
 %operators      ALL = NOPASSWD: OPS
 EOF
 
+# Give config files to operators group
+
+chgrp -R operators /opt/flight/opt/appliance/etc/*
+
 ###########Appliance GUI ##################
 
 mkdir -p /appliance
@@ -425,6 +429,7 @@ EOF
 mkdir /etc/openvpn/ccd-cluster
 touch /etc/openvpn/ipp-cluster
 touch /etc/openvpn/cluster.users
+chgrp operators /etc/openvpn/cluster.users
 
 mkdir -p /var/lib/firstrun/scripts/
 cat << EOF > /var/lib/firstrun/scripts/vpn.bash
