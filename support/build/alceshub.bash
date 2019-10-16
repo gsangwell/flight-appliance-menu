@@ -36,7 +36,7 @@ cat << EOF > /opt/flight/opt/appliance/bin/shell
 EOF
 chmod +x /opt/flight/opt/appliance/bin/shell
 
-cat << EOF > /opt/flight/opt/appliance/bin/apilaunch
+cat << 'EOF' > /opt/flight/opt/appliance/bin/apilaunch
 #!/bin/bash 
 /opt/flight/bin/ruby /opt/flight/opt/appliance/bin/api.rb $@
 EOF
