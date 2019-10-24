@@ -71,7 +71,7 @@ EOF
 
 #operator sudo rule to allow system commands
 cat << EOF > /etc/sudoers.d/10-alces-appliance
-Cmnd_Alias OPS = /sbin/usermod engineer --shell /bin/bash,/sbin/dmidecode,/sbin/usermod engineer --shell /sbin/nologin,/bin/at now + 1 hour -f /tmp/disable.sh,/sbin/useradd,/sbin/lid,/sbin/shutdown,/bin/passwd
+Cmnd_Alias OPS = /sbin/usermod engineer --shell /bin/bash,/sbin/dmidecode,/sbin/usermod engineer --shell /sbin/nologin,/bin/at now + 1 hour -f /tmp/disable.sh,/sbin/useradd,/sbin/lid,/sbin/shutdown,/bin/passwd,/usr/sbin/usermod,/sbin/useradd
 %operators      ALL = NOPASSWD: OPS
 EOF
 
@@ -429,7 +429,6 @@ EOF
 mkdir /etc/openvpn/ccd-cluster
 touch /etc/openvpn/ipp-cluster
 touch /etc/openvpn/cluster.users
-chgrp operators /etc/openvpn/cluster.users
 
 mkdir -p /var/lib/firstrun/scripts/
 cat << EOF > /var/lib/firstrun/scripts/vpn.bash
@@ -443,6 +442,13 @@ cd /etc/openvpn/easyrsa
 #Generate hub keys
 ./easyrsa gen-req hub nopass
 ./easyrsa sign-req server hub
+
+chgrp -R operators /etc/openvpn
+#required for writing cluster.users file.
+chmod 770 /etc/openvpn
+#required for generating templates - this is a public cert.
+chmod 750 /etc/openvpn/easyrsa/pki/
+chmod 660 /etc/openvpn/easyrsa/pki/ca.crt
 
 systemctl enable openvpn@cluster
 systemctl restart openvpn@cluster

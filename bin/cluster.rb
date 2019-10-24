@@ -93,6 +93,7 @@ end
 def promptAssignSlot()
   vpnSlot = $prompt.select("Choose a VPN Slot to assign: ", slotListAvail.keys.to_a)
   clientName = $prompt.ask("Client Name: ", required: true)
+  generateTemplate(vpnSlot)
   assignedVPNSlot = [clientName,vpnSlot]
   begin
     if assignSlot(clientName,vpnSlot)
@@ -141,7 +142,7 @@ def assignSlot(clientName,vpnSlot)
     File.open("/etc/openvpn/ccd-cluster/#{clientName}", 'w') do |l|
       l.puts("ifconfig-push #{slotHash[vpnSlot]['clientip']} #{slotHash[vpnSlot]['serverip']}")
     end
-    if ! Open3.capture3("\/sbin\/useradd -M -N -s \/sbin\/nologin #{clientName} --gid vpn")[2].success?
+    if ! Open3.capture3("sudo \/sbin\/useradd -M -N -s \/sbin\/nologin #{clientName} --gid vpn")[2].success?
       return nil
     else
       slotHash[vpnSlot].store('clientscript', generateTemplate(clientName))
@@ -166,7 +167,7 @@ end
 
 def setPasswd(userName,cryptedPasswd)
   #chpasswdString = userName + ':' + cryptedPasswd
-  chpasswdStatus = Open3.capture3("usermod --password '#{cryptedPasswd}' #{userName}")
+  chpasswdStatus = Open3.capture3("sudo /usr/sbin/usermod --password '#{cryptedPasswd}' #{userName}")
   if chpasswdStatus[2].success?
     return true
   else
@@ -379,7 +380,6 @@ def editClientAssignment()
       vpnSlotFileWrite(slotHash)
       reloadSlotFileConfig()
       writeVPNUsersConf()
-
     end 
   else
     puts "No configured VPNs"
