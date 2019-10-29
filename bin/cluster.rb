@@ -393,27 +393,3 @@ def checkClientResponding(vpnSlotClientIP)
     return false
   end
 end
-
-
- 
-
-#probs unused - snippets only...
-
-
-def clientConfigPrintScript()
-  clPack = $prompt.select("Choose a Cluster Pack", clusterPacksList.each.to_a)
-  scriptPath = $clustersConfig['clusters'][clusterPack]['configpath']
-  script = File.read(scriptPath)
-  puts script
-end
-
-def createNewCluster(assignedVPNSlot)
-  createClusterScript = File.expand_path('../support/vpn/newcluster.bash',__dir__)
-  newClusterScriptStatus = Open3.capture3("#{createClusterScript} #{clusterParams[1]}")
-  if newClusterScriptStatus[2].success?
-    puts "New Cluster VPN Configured - Cluster Script available at #{newClusterScriptStatus[0]}"
-    clusterConfigNewCluster(clusterParams[0],newClusterScriptStatus[0],clusterParams[1])
-  else
-    puts "Script failed to run - output from script was: '#{newClusterScriptStatus[1]}'"
-  end
-end
