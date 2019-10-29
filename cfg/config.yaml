@@ -1,6 +1,7 @@
 ---
 vpn:
-  vpnconfigpath: /opt/appliance/etc
-  vpnslotfile: /opt/appliance/etc/vpnslots.yaml
+  vpnconfigpath: /opt/flight/opt/appliance/etc
+  vpnslotfile: /opt/flight/opt/appliance/etc/vpnslots.yaml
+  vpnusersfile: /etc/openvpn/cluster.users
 
   

@@ -43,12 +43,20 @@ end
 #  end
 #end
 
-def flsh()
-  pid = spawn('/opt/flight/bin/flight shell')
+def loginsh
+  shell('/bin/bash -l')
+end
+
+def flsh
+  shell('/opt/flight/bin/flight shell')
+end
+
+def shell(cmd)
+  pid = spawn(cmd)
   begin
-    Process.wait pid
-  rescue Interrupt
-    Process.kill('INT', pid)
+    Process::wait pid
+  rescue
+    Process::kill('INT', pid)
     retry
   end
 end

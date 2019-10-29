@@ -1,4 +1,4 @@
-#!/opt/appliance/ruby-2.6.3/bin/ruby
+#!/usr/bin/env ruby
 #==============================================================================
 # Copyright (C) 2019-present Alces Flight Ltd.
 #
@@ -40,6 +40,9 @@ Bundler.setup(:default)
 #ENV["PATH"]='/usr/local/rvm/gems/ruby-2.6.3/bin:/usr/local/rvm/rubies/ruby-2.6.3/bin'
 #ENV["GEM_HOME"]='/usr/local/rvm/gems/ruby-2.6.3'
 
+# Set install path of program, for use in user creation
+$app_root = File.expand_path(__dir__ + '/..')
+
 setup()
 
 def apiInetStat()
@@ -49,6 +52,7 @@ def apiInetStat()
   h.merge!('default-gateway': gw())
   h.merge!('dns-servers': dns('nameserver'))
   h.merge!('search-domain': dns('search'))
+  h.merge!('extURL': extDNS)
   return h.to_json
 end
 

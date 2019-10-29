@@ -30,6 +30,7 @@ config = YAML.load(File.read(File.expand_path('../../cfg/config.yaml',__FILE__))
 $vpnSlotFilePath = config['vpn']['vpnslotfile']
 $vpnSlotFileConfig = YAML.load(File.read($vpnSlotFilePath))
 $etcConfigPath = config['vpn']['vpnconfigpath']
+$vpnUsersFile = config['vpn']['vpnusersfile']
 
 def clientMenu()  
   sel = $prompt.select('Choose an option') do |menu|
@@ -92,6 +93,7 @@ end
 def promptAssignSlot()
   vpnSlot = $prompt.select("Choose a VPN Slot to assign: ", slotListAvail.keys.to_a)
   clientName = $prompt.ask("Client Name: ", required: true)
+  generateTemplate(vpnSlot)
   assignedVPNSlot = [clientName,vpnSlot]
   begin
     if assignSlot(clientName,vpnSlot)
@@ -140,7 +142,7 @@ def assignSlot(clientName,vpnSlot)
     File.open("/etc/openvpn/ccd-cluster/#{clientName}", 'w') do |l|
       l.puts("ifconfig-push #{slotHash[vpnSlot]['clientip']} #{slotHash[vpnSlot]['serverip']}")
     end
-    if ! Open3.capture3("\/sbin\/useradd -M -N -s \/sbin\/nologin #{clientName} --gid vpn")[2].success?
+    if ! Open3.capture3("sudo \/sbin\/useradd -M -N -s \/sbin\/nologin #{clientName} --gid vpn")[2].success?
       return nil
     else
       slotHash[vpnSlot].store('clientscript', generateTemplate(clientName))
@@ -149,15 +151,23 @@ def assignSlot(clientName,vpnSlot)
       slotHash[vpnSlot]['password'] = '' 
       vpnSlotFileWrite(slotHash)
       reloadSlotFileConfig()
+      writeVPNUsersConf()
     end
   else
     return nil
   end
 end
 
+def writeVPNUsersConf()
+  users = $vpnSlotFileConfig['slots'].select {|k,v| v['configured']}.map {|k,v| v['clientname']}
+  File.open($vpnUsersFile, "w+") do |f|
+    users.each {|e| f.puts(e)}
+  end
+end
+
 def setPasswd(userName,cryptedPasswd)
   #chpasswdString = userName + ':' + cryptedPasswd
-  chpasswdStatus = Open3.capture3("usermod --password '#{cryptedPasswd}' #{userName}")
+  chpasswdStatus = Open3.capture3("sudo /usr/sbin/usermod --password '#{cryptedPasswd}' #{userName}")
   if chpasswdStatus[2].success?
     return true
   else
@@ -222,6 +232,7 @@ def genClientPasswd(vpnSlot)
       slotHash[vpnSlot]['password'] = cryptedPasswd 
       vpnSlotFileWrite(slotHash)
       reloadSlotFileConfig()
+      writeVPNUsersConf()
       return randomRawPass
     end
   rescue
@@ -324,6 +335,7 @@ def deconfigureVPNClient(deconfVPN)
     deleteVPNClientUser(oldUser)
     vpnSlotFileWrite(slotHash)
     reloadSlotFileConfig()
+    writeVPNUsersConf()
     return true
   rescue
     return nil
@@ -367,6 +379,7 @@ def editClientAssignment()
       slotHash[vpnSlot]['clientname'] = newName
       vpnSlotFileWrite(slotHash)
       reloadSlotFileConfig()
+      writeVPNUsersConf()
     end 
   else
     puts "No configured VPNs"
@@ -378,29 +391,5 @@ def checkClientResponding(vpnSlotClientIP)
     return true
   else
     return false
-  end
-end
-
-
- 
-
-#probs unused - snippets only...
-
-
-def clientConfigPrintScript()
-  clPack = $prompt.select("Choose a Cluster Pack", clusterPacksList.each.to_a)
-  scriptPath = $clustersConfig['clusters'][clusterPack]['configpath']
-  script = File.read(scriptPath)
-  puts script
-end
-
-def createNewCluster(assignedVPNSlot)
-  createClusterScript = File.expand_path('../support/vpn/newcluster.bash',__dir__)
-  newClusterScriptStatus = Open3.capture3("#{createClusterScript} #{clusterParams[1]}")
-  if newClusterScriptStatus[2].success?
-    puts "New Cluster VPN Configured - Cluster Script available at #{newClusterScriptStatus[0]}"
-    clusterConfigNewCluster(clusterParams[0],newClusterScriptStatus[0],clusterParams[1])
-  else
-    puts "Script failed to run - output from script was: '#{newClusterScriptStatus[1]}'"
   end
 end
