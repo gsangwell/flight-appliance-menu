@@ -27,44 +27,6 @@
 #==============================================================================
 
 
-def infomenu()
-  sel = $prompt.select('Choose an option') do |menu|
-    menu.choice 'View Instance Information', 'infoinst'
-    menu.choice 'View Internet Connectivity Status', 'inetstat'
-    menu.choice 'View External IP Address', 'extip'
-    menu.choice 'Return', 'ret'
-  end
-  case sel
-  when 'infoinst'
-    puts infoInst()
-  when 'inetstat'
-    puts inetStat()
-  when 'extip'
-    puts ''
-    ip = extIp()
-    puts 'External IP Address: ' + ip
-  when 'ret'
-    main()
-  end
-end
-
-def inetStatTableGenerate()
-  table = []
-  table << ['Ping 8.8.8.8? ', pingIp()]
-  table << ['Resolve alces-software.com? ', resolv('alces-software.com')]
-  table << ['Default Gateway', gw()]
-  table << ['Primary DNS Server', dns('nameserver').first]
-  table << ['Search Domain', dns('search').first]
-  table << ['External URL', extDNS]
-  title = "Internet Connectivity Information"
-  ary = [title, table]
-  return ary
-end
-
-def inetStat()
-  inetStatTable = inetStatTableGenerate()
-  puts outputTable(inetStatTable[0], inetStatTable[1])
-end
 
 def pingIpTest()
   begin
@@ -79,6 +41,7 @@ def extDNS
   ssl_name=`echo $(basename $(echo /opt/flight/etc/ssl/certs-hub-*) | sed 's/^certs-//g')`.chomp
   "https://#{ssl_name}.appliance.alces.network"
 end
+
 
 def pingIp()
   if pingIpTest()
@@ -96,6 +59,7 @@ def resolv(address)
     return false
   end
 end
+
 
 def gw()
   begin

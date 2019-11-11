@@ -79,6 +79,15 @@ EOF
 
 chgrp -R operators /opt/flight/opt/appliance/etc/*
 
+
+########Set up logging directory########
+mkdir -p /var/log/alces
+chgrp operators /var/log/alces
+chmod 775 /var/log/alces
+touch /var/log/alces/flightappmenu
+chgrp operators /var/log/alces/flightappmenu
+chmod 664 /var/log/alces/flightappmenu 
+
 ###########Appliance GUI ##################
 
 mkdir -p /appliance

@@ -30,6 +30,8 @@ $LOAD_PATH << File.expand_path(__dir__ )
 #$LOAD_PATH << "/usr/local/rvm/gems/ruby-2.6.3/gems"
 
 ENV['BUNDLE_GEMFILE'] ||= File.join(__dir__, '../Gemfile')
+#set global var to know whether CLI or API was invoked.
+$INVOKE_SRC = 'api'
 
 require 'rubygems'
 require 'bundler/setup'
@@ -346,6 +348,7 @@ end
 
 
 begin
+  appendLogFile('API Call - ARGV was:', ARGV.to_s)
   case ARGV[0]
   when 'infoInst'
     puts apiInfoInst()

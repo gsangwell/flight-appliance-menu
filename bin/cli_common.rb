@@ -1,4 +1,4 @@
-#!/opt/flight/bin/ruby
+#!/usr/bin/env ruby
 #==============================================================================
 # Copyright (C) 2019-present Alces Flight Ltd.
 #
@@ -26,5 +26,9 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-$app_root = File.expand_path(__dir__ + '/..')
-load "#{$app_root}/bin/cli.rb"
+$spinner = TTY::Spinner.new(interval: 20)
+
+def outputTable(title, tableData, *headerData)
+  table = Terminal::Table.new :title => title, :rows => tableData, :headings => headerData
+  return table
+end

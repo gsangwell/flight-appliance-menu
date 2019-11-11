@@ -26,12 +26,6 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-config = YAML.load(File.read(File.expand_path('../../cfg/config.yaml',__FILE__)))
-$vpnSlotFilePath = config['vpn']['vpnslotfile']
-$vpnSlotFileConfig = YAML.load(File.read($vpnSlotFilePath))
-$etcConfigPath = config['vpn']['vpnconfigpath']
-$vpnUsersFile = config['vpn']['vpnusersfile']
-
 def clientMenu()  
   sel = $prompt.select('Choose an option') do |menu|
     menu.choice 'View VPN Status', 'viewClients'
@@ -44,7 +38,6 @@ def clientMenu()
   end
   return sel
 end
-
 
 def client()
   case clientMenu()
@@ -63,10 +56,6 @@ def client()
   when 'getout'
     main()
   end
-end
-
-def reloadSlotFileConfig()
-  $vpnSlotFileConfig = YAML.load(File.read($vpnSlotFilePath))
 end
 
 def promptSelectUsedSlot()
@@ -104,7 +93,7 @@ def promptAssignSlot()
       client()
     end
   rescue
-    puts "Could not assign slot."
+    outputError('promptAssignSlot()','Could not assign slot')
     client()
   end
 end
@@ -117,78 +106,6 @@ def promptSelectSlot()
     return nil
   end
 end 
-
-
-def vpnSlotFileWrite(slotHash)
-  $vpnSlotFileConfig['slots'].merge!(slotHash)
-  writeHashToYaml($vpnSlotFileConfig,$vpnSlotFilePath)
-end
-
-def slotList()
-  slotList = $vpnSlotFileConfig['slots'].keys 
-end
-
-def slotListAvail()
-  slotListAvail = $vpnSlotFileConfig['slots'].reject {|k,h| h['configured']}
-end
-
-def slotListUsed()
-  slotListUsed = $vpnSlotFileConfig['slots'].select {|k,h| h['configured']} 
-end
-
-def assignSlot(clientName,vpnSlot)
-  slotHash = $vpnSlotFileConfig ['slots'].select {|k,h| k == vpnSlot}
-  if ! slotHash.empty? && slotListAvail.keys.include?(vpnSlot) 
-    File.open("/etc/openvpn/ccd-cluster/#{clientName}", 'w') do |l|
-      l.puts("ifconfig-push #{slotHash[vpnSlot]['clientip']} #{slotHash[vpnSlot]['serverip']}")
-    end
-    if ! Open3.capture3("sudo \/sbin\/useradd -M -N -s \/sbin\/nologin #{clientName} --gid vpn")[2].success?
-      return nil
-    else
-      slotHash[vpnSlot].store('clientscript', generateTemplate(clientName))
-      slotHash[vpnSlot]['clientname'] = clientName
-      slotHash[vpnSlot]['configured'] = true
-      slotHash[vpnSlot]['password'] = '' 
-      vpnSlotFileWrite(slotHash)
-      reloadSlotFileConfig()
-      writeVPNUsersConf()
-    end
-  else
-    return nil
-  end
-end
-
-def writeVPNUsersConf()
-  users = $vpnSlotFileConfig['slots'].select {|k,v| v['configured']}.map {|k,v| v['clientname']}
-  File.open($vpnUsersFile, "w+") do |f|
-    users.each {|e| f.puts(e)}
-  end
-end
-
-def setPasswd(userName,cryptedPasswd)
-  #chpasswdString = userName + ':' + cryptedPasswd
-  chpasswdStatus = Open3.capture3("sudo /usr/sbin/usermod --password '#{cryptedPasswd}' #{userName}")
-  if chpasswdStatus[2].success?
-    return true
-  else
-    return false
-  end
-end
-
-def genPasswd()
-  passwdAry = []
-  o = [('a'..'z'), ('A'..'Z')].map(&:to_a).flatten
-  generatedPasswd = (0...15).map { o[rand(o.length)] }.join
-  passwdAry = []
-  passwdAry[0] = generatedPasswd
-  passwdOut,err,status = Open3.capture3("printf '#{generatedPasswd}' | \/bin\/openssl passwd -1 -stdin")
-  if status.success?
-    passwdAry[1] = passwdOut[0..-2]
-    return passwdAry
-  else
-    raise StandardError
-  end
-end
 
 def promptGenClientPasswd()
   slot = promptSelectUsedSlot()
@@ -217,56 +134,6 @@ def promptGenClientPasswd()
   end
 end
 
-
-def genClientPasswd(vpnSlot)
-  begin
-    passwdAry = genPasswd()
-    randomRawPass = passwdAry[0]
-    cryptedPasswd = passwdAry[1]
-    slotHash = $vpnSlotFileConfig ['slots'].select {|k,h| k == vpnSlot}
-    if ! slotHash.empty? || ! slotHash[vpnSlot]['configured'] == true
-      clientName = slotHash[vpnSlot]['clientname']
-      if ! setPasswd(clientName, cryptedPasswd)
-        fail
-      end
-      slotHash[vpnSlot]['password'] = cryptedPasswd 
-      vpnSlotFileWrite(slotHash)
-      reloadSlotFileConfig()
-      writeVPNUsersConf()
-      return randomRawPass
-    end
-  rescue
-    return nil
-  end
-end
-
-# def promptPasswd()
-#   rawPasswd1 = $prompt.mask("Enter a password: ")
-#   rawPasswd2 = $prompt.mask("Confirm the password: ")
-#   rawPasswds = [rawPasswd1,rawPasswd2]
-# end
-
-# def checkPasswd()
-#   rawPasswds = promptPasswd()
-#   while rawPasswds[0] != rawPasswds[1]
-#     puts "Passwords do not match - try again"
-#     rawPasswds = promptPasswd() 
-#   end
-#   return rawPasswds[0] 
-# end
-
-def getVpnList()
-  slots = {}
-  slothash = {}
-  slotListUsed.each_key do |slot|
-    clientname = $vpnSlotFileConfig['slots'][slot]['clientname']
-    pingable = checkClientResponding($vpnSlotFileConfig['slots'][slot]['clientip'])
-    slothash = {:clientname => clientname, :connstatus => pingable}
-    slots.merge! slot => slothash 
-  end
-  return slots
-end
-
 def viewVPNs()
   $spinner.run do |spinner|
     table = []
@@ -281,31 +148,6 @@ def viewVPNs()
   end
 end
 
-def caCrt()
-  File.read('/etc/openvpn/easyrsa/pki/ca.crt')
-end
-
-def generateTemplate(clientName)
-  @clientName = clientName
-  template = File.read(File.join($etcConfigPath, 'vpnclienttemplate.erb'))
-  renderer = ERB.new(template)
-  renderer.result()
-end
-
-def getVPNClientScript(vpnSlot)
-  begin
-    slotHash = $vpnSlotFileConfig ['slots'].select {|k,h| k == vpnSlot}
-    if ! slotHash[vpnSlot]['clientscript'].nil? 
-      return slotHash[vpnSlot]['clientscript']
-    else 
-      return nil
-    end
-  rescue
-    return nil
-  end
-end
-
-
 def printVPNClientScript()
   vpnSlot = promptSelectUsedSlot()
   if ! vpnSlot.nil?
@@ -317,28 +159,6 @@ def printVPNClientScript()
     end
   else
     puts "No VPNs assigned"
-  end
-end
-
-def deleteVPNClientUser(clientUser)
-  deleteUser(clientUser)
-end
-
-def deconfigureVPNClient(deconfVPN)
-  begin
-    slotHash = $vpnSlotFileConfig ['slots'].select {|k,h| k == deconfVPN} 
-    oldUser = slotHash[deconfVPN]['clientname'] 
-    slotHash[deconfVPN]['configured'] = false
-    slotHash[deconfVPN]['clientname'] = nil
-    slotHash[deconfVPN]['password'] = nil
-    slotHash[deconfVPN]['clientscript'] = nil
-    deleteVPNClientUser(oldUser)
-    vpnSlotFileWrite(slotHash)
-    reloadSlotFileConfig()
-    writeVPNUsersConf()
-    return true
-  rescue
-    return nil
   end
 end
 
@@ -383,13 +203,5 @@ def editClientAssignment()
     end 
   else
     puts "No configured VPNs"
-  end
-end
-
-def checkClientResponding(vpnSlotClientIP)
-  if Net::Ping::External.new(vpnSlotClientIP, nil, 1).ping? 
-    return true
-  else
-    return false
   end
 end

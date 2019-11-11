@@ -1,4 +1,4 @@
-#!/opt/flight/bin/ruby
+#/usr/bin/env ruby
 #==============================================================================
 # Copyright (C) 2019-present Alces Flight Ltd.
 #
@@ -26,5 +26,46 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-$app_root = File.expand_path(__dir__ + '/..')
-load "#{$app_root}/bin/cli.rb"
+def platform()
+  return "Amazon AWS"
+end
+
+def extIp()
+  extip = Net::HTTP.get('ifconfig.co', '/ip')
+  return extip.to_str
+end
+
+def intIp()
+  intip = IPSocket.getaddress(Socket.gethostname)
+  return intip.to_str
+end
+
+def hostname()
+  hostname = Socket.gethostname
+  return hostname.to_str
+end
+
+def identity(data)
+  document = JSON.load(Net::HTTP.get('169.254.169.254', 'latest/dynamic/instance-identity/document'))
+  return document[data]
+end
+
+def region()
+  return identity('region')
+end
+
+def instanceType()
+  return identity('instanceType')
+end
+
+
+def infoInstApiHandler()
+  h = {}
+  h.merge!('platform': platform())
+  h.merge!('availability-zone': identity('availabilityZone'))
+  h.merge!('instance-type': identity('instanceType'))
+  h.merge!('external-ip': extIp().gsub("\n",""))
+  h.merge!('internal-ip': intIp())
+  h.merge!('hostname': hostname())
+  return h.to_json
+end

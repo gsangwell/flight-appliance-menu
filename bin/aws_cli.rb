@@ -1,4 +1,4 @@
-#!/opt/flight/bin/ruby
+#/usr/bin/env ruby
 #==============================================================================
 # Copyright (C) 2019-present Alces Flight Ltd.
 #
@@ -26,5 +26,21 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-$app_root = File.expand_path(__dir__ + '/..')
-load "#{$app_root}/bin/cli.rb"
+
+def infoInst()
+  infoInstTable=infoInstTableGenerate()
+  puts outputTable(infoInstTable[0], infoInstTable[1])
+end
+
+def infoInstTableGenerate()
+  table = []
+  table << ['Platform', "Amazon AWS"]
+  table << ['Availability Zone', identity('availabilityZone')]
+  table << ['Instance Type', identity('instanceType')]
+  table << ['External IP Address', extIp()]
+  table << ['Internal IP Address', intIp()]
+  table << ['Hostname', hostname()]
+  title = "Instance Information"
+  ary = [title, table]
+  return ary
+end

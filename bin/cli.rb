@@ -31,6 +31,9 @@ $LOAD_PATH << File.expand_path(__dir__ )
 
 ENV['BUNDLE_GEMFILE'] ||= File.join(__dir__, '../Gemfile')
 
+#set global var to know whether CLI or API was invoked.
+$INVOKE_SRC = 'cli'
+
 require 'rubygems'
 require 'bundler/setup'
 require 'setup'
@@ -38,14 +41,11 @@ require 'setup'
 Bundler.setup(:default)
 setup()
 
-#ENV["PATH"]='/usr/local/rvm/gems/ruby-2.6.3/bin:/usr/local/rvm/rubies/ruby-2.6.3/bin'
-#ENV["GEM_HOME"]='/usr/local/rvm/gems/ruby-2.6.3'
-
 # Set install path of program, for use in user creation
 $app_root = File.expand_path(__dir__ + '/..')
 
 begin
-  require 'menu'
+  #require 'menu'
   main()
 rescue Interrupt,TTY::Reader::InputInterrupt 
   puts "\n Quitting..."

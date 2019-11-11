@@ -26,12 +26,10 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-$spinner = TTY::Spinner.new(interval: 20)
+$logFileLocation = File.open('/var/log/alces/flightappmenu',"a")
+$logger = Logger.new($logFileLocation)
+$logger_stderr = Logger.new(STDERR)
 
-def outputTable(title, tableData, *headerData)
-  table = Terminal::Table.new :title => title, :rows => tableData, :headings => headerData
-  return table
-end
 
 #def checkUserGroup(user)
 #  response = Open3.capture3('groups #{user}')
@@ -67,3 +65,15 @@ def writeHashToYaml(hash,filepath)
   end
 end
 
+def appendLogFile(source,action)
+  user = `whoami`
+  out = "User: " + user.strip + " - " + source + " " + action
+  $logger.info(out)
+end
+
+def outputError(source,action)
+  user = `whoami`
+  out = "User: " + user.strip + " - " + source + " " + action
+  $logger.error(out)
+  $logger_stderr.error(out)
+end

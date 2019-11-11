@@ -26,43 +26,6 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-def platform()
-  return "Microsoft Azure"
-end
-
-def extIp()
-  extIp = Net::HTTP.get('ifconfig.co', '/ip')
-  return extIp.to_str
-end
-
-def intIp()
-  intIp = IPSocket.getaddress(Socket.gethostname)
-  return intIp.to_str
-end
-
-def hostname()
-  hostname = Socket.gethostname
-  return hostname.to_str
-end
-
-def identity()
-  uri = URI('http://169.254.169.254/metadata/instance?api-version=2019-03-11')
-  req = Net::HTTP::Get.new(uri)
-  req['Metadata'] = true
-  response = Net::HTTP.start(uri.hostname, uri.port) {|http|
-    http.request(req)
-  }
-  document = JSON.load(response.body)
-  return document
-end
-
-def region()
-  return identity['compute']['location']
-end
-
-def instanceType()
-  return identity['compute']['vmSize']
-end
 
 def infoInst()
   infoInstTable = infoInstTableGenerate()
@@ -79,16 +42,6 @@ def infoInstTableGenerate()
   table << ['Hostname', hostname()]
   title = "Instance Information"
   ary = [title, table]
+  appendLogFile('infoInst()', 'returned instance info table')
   return ary
-end
-
-def infoInstApiHandler()
-  h = {}
-  h.merge!('platform': platform())
-  h.merge!('region': region())
-  h.merge!('instance-type': instanceType())
-  h.merge!('external-ip': extIp().gsub("\n",""))
-  h.merge!('internal-ip': intIp())
-  h.merge!('hostname': hostname())
-  return h.to_json
 end
