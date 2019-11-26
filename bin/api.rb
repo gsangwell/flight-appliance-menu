@@ -55,42 +55,45 @@ def apiInetStat()
   h.merge!('dns-servers': dns('nameserver'))
   h.merge!('search-domain': dns('search'))
   h.merge!('extURL': extDNS)
-  return h.to_json
+  return h
 end
 
 def apiEngMode()
-  engModeHandler(engmode()).to_json
+  engModeHandler(engmode())
 end
-
 
 def apiExtIp()
   h = {}
   h.merge!('external-ip': extIp().gsub("\n",""))
-  return h.to_json
+  return h
 end
 
 def apiAvailZone()
   h = {}
   h.merge!('availability-zone': region())
-  return h.to_json
+  return h
 end
 
 def apiInstanceType()
   h = {}
   h.merge!('instance-type': instanceType())
-  return h.to_json
+  return h
 end
 
 def apiIntIp()
   h = {}
   h.merge!('internal-ip': intIp())
-  return h.to_json
+  return h
 end
 
 def apiGetUserList()
-  h = {}
-  h.merge!(users: getUserList())
-  return h.to_json
+  if users = getUserList()
+    h = {}
+    h.merge!(users: getUserList())
+    return h
+  else
+    return {'status' => false} 
+  end 
 end
 
 def apiInfoInst()
@@ -178,8 +181,6 @@ def apiUserDelete(inputJson)
   end
 end
     
-
- 
 def apiShutdown(inputJson)
   begin
     hash = JSON.parse(inputJson)
@@ -193,7 +194,6 @@ def apiShutdown(inputJson)
     return {'status' => false}
   end
 end
-
  
 def apiReboot(inputJson)
   begin
@@ -314,8 +314,6 @@ def apiVpnDeconfigure(inputJson)
   end
 end 
 
-
-
 def apiHelp()
   <<~HEREDOC
 
@@ -345,55 +343,60 @@ def apiHelp()
   HEREDOC
 end
 
-
-
 begin
-  appendLogFile('API Call - ARGV was:', ARGV.to_s)
+  appendLogFile('API Call - ARGV:', ARGV.to_s)
   case ARGV[0]
   when 'infoInst'
-    puts apiInfoInst()
+    response = apiInfoInst()
   when 'inetStat'
-    puts apiInetStat()
+    response = apiInetStat()
   when 'extIp'
-    puts apiExtIp()
+    response = apiExtIp()
   when 'intIp'
-    puts apiIntIp()
+    response = apiIntIp()
   when 'availabilityZone'
-    puts apiAvailZone()
+    response = apiAvailZone()
   when 'instanceType'
-    puts apiInstanceType()
+    response = apiInstanceType()
   when 'engMode'
-    puts apiEngMode()
+    response = apiEngMode()
   when 'userCreate'
-    puts apiCreateUser(ARGV[1]).to_json
+    response = apiCreateUser(ARGV[1])
   when 'userSetKey'
-    puts apiSetKey(ARGV[1]).to_json
+    response = apiSetKey(ARGV[1])
   when 'userGetList'
-    puts apiGetUserList()
+    response = apiGetUserList()
   when 'userSetPasswd'
-    puts apiUserSetPasswd(ARGV[1]).to_json
+    response = apiUserSetPasswd(ARGV[1])
   when 'userDelete'
-    puts apiUserDelete(ARGV[1]).to_json
+    response = apiUserDelete(ARGV[1])
   when 'vpnStatus'
-    puts apiVpnStatus().to_json
+    response = apiVpnStatus()
   when 'vpnSlotsAvail'
-    puts apiVpnSlotsAvail().to_json
+    response = apiVpnSlotsAvail()
   when 'vpnAssign'
-    puts apiVpnAssign(ARGV[1]).to_json
+    response = apiVpnAssign(ARGV[1])
   when 'vpnViewClientScript'
-    puts apiVpnViewClientScript(ARGV[1]).to_json
+    response = apiVpnViewClientScript(ARGV[1])
   when 'vpnGeneratePasswd'
-    puts apiVpnGeneratePassword(ARGV[1]).to_json
+    response = apiVpnGeneratePassword(ARGV[1])
   when 'vpnDeconfigure'
-    puts apiVpnDeconfigure(ARGV[1]).to_json
+    response = apiVpnDeconfigure(ARGV[1])
   when 'shutdown'
-    puts apiShutdown(ARGV[1]).to_json
+    response = apiShutdown(ARGV[1])
   when 'reboot'
-    puts apiReboot(ARGV[1]).to_json
+    response = apiReboot(ARGV[1])
   when 'help'
-    puts apiHelp()
+    response = apiHelp()
   else
-    puts "Invalid Command - use help for a list of requests"
+    response = "Invalid Command - use help for a list of requests"
+    quietError('Invalid API Call', 'No suitable function found')
+  end  
+  if response['status'] == false
+    quietError('API Response', response.to_json)
+  else
+    appendLogFile('API Response:', response.to_json)
   end
-
+  ## After all that, print it to screen.
+  puts response.to_json
 end

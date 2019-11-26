@@ -27,34 +27,40 @@
 #==============================================================================
 
 def getUserList()
-  userlist = `sudo lid -g operators`.split
-  userlist.each_with_index do |e,i|
-    userlist[i] = e.gsub(/\(.*\)/, '')
+  begin
+    userlistraw = Open3.capture3("sudo lid -g operators")
+    if userlistraw[2].success?
+      userlist = userlistraw[0].split
+      userlist.each_with_index do |e,i|
+        userlist[i] = e.gsub(/\(.*\)/, '')
+      end
+      return userlist 
+    else
+      raise StandardError
+    end
+  rescue
+    quietError('getUserList()', "Command failed with: #{userlistraw}")
+    return false
   end
-  return userlist 
-end
-
-def viewusers()
-  users = getUserList()
-  return outputTable("Users", users.zip)
-end
-
-def newUser()
-  user = getUser()
-  createUser(user[0],user[1])
-  setUserSSHKey(user[0],getKey())
 end
 
 def createUser(uname,fname)
-  Open3.capture3("sudo \/sbin\/useradd #{uname} -G operators --comment \"#{fname}\" --shell #{$app_root}/bin/flightusershell.rb")
+  newUser = Open3.capture3("sudo \/sbin\/useradd #{uname} -G operators --comment \"#{fname}\" --shell #{$app_root}/bin/flightusershell.rb")
+  if newUser[2].success?
+    appendLogFile("createUser(#{uname},#{fname})",newUser.to_s)
+    return true
+  else
+    quietError("createUser(#{uname},#{fname})",newUser.to_s)
+    return false
+  end
 end
 
 #Currently unused - used for reading keys from files.
-def readKeyFromFile(file)
-  key = []
-  key << File.read(File.expand_path(file))
-  return key.first
-end
+#def readKeyFromFile(file)
+#  key = []
+#  key << File.read(File.expand_path(file))
+#  return key.first
+#end
 
 def setUserSSHKey(uname, key)
   begin
@@ -66,8 +72,10 @@ def setUserSSHKey(uname, key)
     FileUtils.chown(uname, uname, "/home/#{uname}/.ssh")
     FileUtils.chmod(0700, "/home/#{uname}/.ssh") 
     FileUtils.chown(uname, uname, "/home/#{uname}/.ssh/authorized_keys")
+    appendLogFile("setUserSSHKey(#{uname}, key)",'')
     return true 
   rescue
+    quietError("setUserSSHKey(#{uname}, key)",'')
     return false
   end
 end
@@ -80,11 +88,14 @@ def deleteUserHandler(user)
   begin
     deleteUserStatus = deleteUser(user)
     if deleteUserStatus[2].success?
+      appendLogFile("deleteUserHandler(#{user})",deleteUserStatus.to_s)
       return true
     else
+      quietError("deleteUserHandler(#{user})",deleteUserStatus.to_s)
       return false
     end
   rescue 
+    quietError("deleteUserHandler(#{user})",deleteUserStatus.to_s)
     raise StandardError
   end
 end

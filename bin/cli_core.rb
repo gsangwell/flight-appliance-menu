@@ -55,7 +55,6 @@ def getout()
 end
 
 def main()
-  setup()
   loop do
     puts "\n"
     case mainmenu()
@@ -73,9 +72,9 @@ def main()
       puts '=========='
       puts ''
     when 'shutdown'
-      shutdown()
+      shutdown_cli()
     when 'reboot'
-      reboot()
+      reboot_cli()
     when 'getout'
       getout()
     when 'client'

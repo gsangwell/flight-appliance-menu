@@ -33,12 +33,22 @@ $etcConfigPath = config['vpn']['vpnconfigpath']
 $vpnUsersFile = config['vpn']['vpnusersfile']
 
 def reloadSlotFileConfig()
-  $vpnSlotFileConfig = YAML.load(File.read($vpnSlotFilePath))
+  begin
+    $vpnSlotFileConfig = YAML.load(File.read($vpnSlotFilePath))
+    appendLogFile("reloadSlotFileConfig()","Success")
+  rescue
+    quietError("reloadSlotFileConfig()","Failed")
+  end
 end
 
 def vpnSlotFileWrite(slotHash)
-  $vpnSlotFileConfig['slots'].merge!(slotHash)
-  writeHashToYaml($vpnSlotFileConfig,$vpnSlotFilePath)
+  begin
+    $vpnSlotFileConfig['slots'].merge!(slotHash)
+    writeHashToYaml($vpnSlotFileConfig,$vpnSlotFilePath)
+    appendLogFile('vpnSlotFileWrite(slotHash)',$vpnSlotFilePath)
+  rescue
+    quietError('vpnSlotFileWrite(slothash)',$vpnSlotFilePath)
+  end
 end
 
 def slotList()
@@ -55,20 +65,31 @@ end
 
 def assignSlot(clientName,vpnSlot)
   slotHash = $vpnSlotFileConfig ['slots'].select {|k,h| k == vpnSlot}
+  appendLogFile("assignSlot(#{clientName},#{vpnSlot})", "Data from config: #{slotHash.to_s}")
   if ! slotHash.empty? && slotListAvail.keys.include?(vpnSlot) 
-    File.open("/etc/openvpn/ccd-cluster/#{clientName}", 'w') do |l|
-      l.puts("ifconfig-push #{slotHash[vpnSlot]['clientip']} #{slotHash[vpnSlot]['serverip']}")
+    begin
+      File.open("/etc/openvpn/ccd-cluster/#{clientName}", 'w') do |l|
+        l.puts("ifconfig-push #{slotHash[vpnSlot]['clientip']} #{slotHash[vpnSlot]['serverip']}")
+      end
+    rescue
+      quietError("assignSlot(#{clientName},#{vpnSlot})","Could not write to /etc/openvpn/ccd-cluster/#{clientName}")
     end
-    if ! Open3.capture3("sudo \/sbin\/useradd -M -N -s \/sbin\/nologin #{clientName} --gid vpn")[2].success?
+    a = Open3.capture3("sudo \/sbin\/useradd -M -N -s \/sbin\/nologin #{clientName} --gid vpn")
+    if ! a[2].success?
+      quietError("assignSlot(#{clientName},#{vpnSlot})", a.to_s)
       return nil
     else
       slotHash[vpnSlot].store('clientscript', generateTemplate(clientName))
       slotHash[vpnSlot]['clientname'] = clientName
       slotHash[vpnSlot]['configured'] = true
       slotHash[vpnSlot]['password'] = '' 
-      vpnSlotFileWrite(slotHash)
-      reloadSlotFileConfig()
-      writeVPNUsersConf()
+      begin
+        vpnSlotFileWrite(slotHash)
+        reloadSlotFileConfig()
+        writeVPNUsersConf()
+      rescue StandardError => e
+        quietError('assignSlot(clientName,vpnSlot)', "#{e.inspect}")
+      end
     end
   else
     return nil
@@ -76,9 +97,15 @@ def assignSlot(clientName,vpnSlot)
 end
 
 def writeVPNUsersConf()
-  users = $vpnSlotFileConfig['slots'].select {|k,v| v['configured']}.map {|k,v| v['clientname']}
-  File.open($vpnUsersFile, "w+") do |f|
-    users.each {|e| f.puts(e)}
+  begin
+    users = $vpnSlotFileConfig['slots'].select {|k,v| v['configured']}.map {|k,v| v['clientname']}
+    File.open($vpnUsersFile, "w+") do |f|
+      users.each {|e| f.puts(e)}
+    end
+    appendLogFile('writeVPNUsersConf()', "#{$vpnUsersFile} written successfully")
+  rescue
+    quietError('writeVPNUsersConf()', "Could not write to #{$vpnUsersFile}")
+    return false
   end
 end
 
@@ -86,8 +113,10 @@ def setPasswd(userName,cryptedPasswd)
   #chpasswdString = userName + ':' + cryptedPasswd
   chpasswdStatus = Open3.capture3("sudo /usr/sbin/usermod --password '#{cryptedPasswd}' #{userName}")
   if chpasswdStatus[2].success?
+    appendLogFile("setPasswd(#{userName},#{cryptedPasswd})", "#{chpasswdStatus}")
     return true
   else
+    quietError("setPasswd(#{userName},#{cryptedPasswd})","Failed setting password - #{chpasswdStatus.to_s}")
     return false
   end
 end
@@ -103,6 +132,7 @@ def genPasswd()
     passwdAry[1] = passwdOut[0..-2]
     return passwdAry
   else
+    quietError("genPasswd()","Failed generating password - #{passwdOut} #{err}")
     raise StandardError
   end
 end

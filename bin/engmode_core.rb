@@ -27,22 +27,28 @@
 #==============================================================================
 
 def engmode()
-   user = `whoami`
-   setShell = Open3.capture3("sudo /sbin/usermod engineer --shell /bin/bash")
-   
-   script = <<~SCRIPT
-   #!/bin/bash
-   sudo /sbin/usermod engineer --shell /sbin/nologin
-   rm /tmp/disable.sh
-   SCRIPT
-   f = File.open("/tmp/disable.sh", 'w')
-   f.puts script
-   f.close
-   createJob = Open3.capture3("sudo at now + 1 hour -f /tmp/disable.sh")
-   status = []
-   status << setShell
-   status << createJob
-   return status
+   begin
+      user = `whoami`
+      setShell = Open3.capture3("sudo /sbin/usermod engineer --shell /bin/bash")
+      
+      script = <<~SCRIPT
+      #!/bin/bash
+      sudo /sbin/usermod engineer --shell /sbin/nologin
+      rm /tmp/disable.sh
+      SCRIPT
+      f = File.open("/tmp/disable.sh", 'w')
+      f.puts script
+      f.close
+      createJob = Open3.capture3("sudo at now + 1 hour -f /tmp/disable.sh")
+      status = []
+      status << setShell
+      status << createJob
+      appendLog('engmode()',status.to_s)
+      return status
+   rescue
+      quietError('engmode()',status.to_s)
+      return status
+   end
 end
 
 def engModeHandler(status)

@@ -26,8 +26,6 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-
-
 def pingIpTest()
   begin
     Net::Ping::External.new("8.8.8.8").ping?
@@ -38,8 +36,13 @@ def pingIpTest()
 end
 
 def extDNS
-  ssl_name=`echo $(basename $(echo /opt/flight/etc/ssl/certs-hub-*) | sed 's/^certs-//g')`.chomp
-  "https://#{ssl_name}.appliance.alces.network"
+  begin
+    ssl_name=`echo $(basename $(echo /opt/flight/etc/ssl/certs-hub-*) | sed 's/^certs-//g')`.chomp
+    dnsName = "https://#{ssl_name}.appliance.alces.network"
+  rescue
+    quietError("extDNS()", "Could not get SSL name")
+    return false
+  end
 end
 
 
@@ -54,8 +57,10 @@ end
 def resolv(address)
   dns_resolver = Resolv::DNS.new()
   begin dns_resolver.getaddress(address) 
+    appendLogFile("resolv()", "Resolved #{address}")
     return true
-  rescue 
+  rescue
+    quietError("resolv()", "Could not resolve #{address}") 
     return false
   end
 end
@@ -63,24 +68,31 @@ end
 
 def gw()
   begin
-    gw = `/sbin/ip route show`[/default.*/][/\d+\.\d+\.\d+\.\d+/]
-    return gw
+    gw = Open3.capture3("/sbin/ip route show")
+    out = gw[0][/default.*/][/\d+\.\d+\.\d+\.\d+/]
+    appendLogFile('gw()', out)
+    return out
   rescue
+    quietError('gw()', gw.to_s)
     return false
   end
 end
 
 def dns(*type)
-  dns = Resolv::DNS::Config.default_config_hash
-  case type[0]
-  when 'nameserver'
-    return dns[:nameserver]
-  when 'search'
-    return dns[:search]
-  else
-    hash = {}
-    hash.merge!(nameservers: dns[:nameserver])
-    hash.merge!(search: dns[:search])
-    return hash
+  begin
+    dns = Resolv::DNS::Config.default_config_hash
+    case type[0]
+    when 'nameserver'
+      return dns[:nameserver]
+    when 'search'
+      return dns[:search]
+    else
+      hash = {}
+      hash.merge!(nameservers: dns[:nameserver])
+      hash.merge!(search: dns[:search])
+      return hash
+    end
+  rescue
+    quietError("dns(#{type})", dns.to_s)
   end
 end

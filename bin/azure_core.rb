@@ -31,29 +31,54 @@ def platform()
 end
 
 def extIp()
-  extIp = Net::HTTP.get('ifconfig.co', '/ip')
-  return extIp.to_str
+  begin 
+    extIp = Net::HTTP.get('ifconfig.co', '/ip')
+    appendLogFile('extIp()',extIp)
+    return extIp.to_str
+  rescue
+    quietError('extIP()', 'Command Failed')
+  end
 end
 
+#def extIp()
+#  extIp = Net::HTTP.get('ifconfig.co', '/ip')
+#  return extIp.to_str
+#end
+
 def intIp()
-  intIp = IPSocket.getaddress(Socket.gethostname)
-  return intIp.to_str
+  begin
+    intIp = IPSocket.getaddress(Socket.gethostname)
+    appendLogFile('intIp()',intIp)
+    return intIp.to_str
+  rescue
+    quietError('intIp()', 'Command Failed')
+  end
 end
 
 def hostname()
-  hostname = Socket.gethostname
-  return hostname.to_str
+  begin 
+    hostname = Socket.gethostname
+    appendLogFile('hostname()',hostname)
+    return hostname.to_str
+  rescue
+    quietError('hostname()','Command Failed')
+  end
 end
 
 def identity()
-  uri = URI('http://169.254.169.254/metadata/instance?api-version=2019-03-11')
-  req = Net::HTTP::Get.new(uri)
-  req['Metadata'] = true
-  response = Net::HTTP.start(uri.hostname, uri.port) {|http|
-    http.request(req)
-  }
-  document = JSON.load(response.body)
-  return document
+  begin 
+    uri = URI('http://169.254.169.254/metadata/instance?api-version=2019-03-11')
+    req = Net::HTTP::Get.new(uri)
+    req['Metadata'] = true
+    response = Net::HTTP.start(uri.hostname, uri.port) {|http|
+      http.request(req)
+    }
+    document = JSON.load(response.body)
+    appendLogFile('identity()',document.to_s)
+    return document
+  rescue
+    quietError('identity()','Command Failed')
+  end
 end
 
 def region()
@@ -72,5 +97,5 @@ def infoInstApiHandler()
   h.merge!('external-ip': extIp().gsub("\n",""))
   h.merge!('internal-ip': intIp())
   h.merge!('hostname': hostname())
-  return h.to_json
+  return h
 end

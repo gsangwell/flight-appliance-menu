@@ -44,9 +44,22 @@ setup()
 # Set install path of program, for use in user creation
 $app_root = File.expand_path(__dir__ + '/..')
 
+class HandledError < StandardError
+  attr_reader :error
+
+  def initialize(error)
+    @error = error
+  end
+end
+
 begin
   #require 'menu'
   main()
 rescue Interrupt,TTY::Reader::InputInterrupt 
   puts "\n Quitting..."
+rescue HandledError => e
+  outputError("Caught unexpected error, quitting...", e.error.inspect)
+rescue => e
+  outputError('Caught unexpected error, continuing...', e.inspect)
+  retry
 end

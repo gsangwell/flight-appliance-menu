@@ -31,23 +31,43 @@ def platform()
 end
 
 def extIp()
-  extip = Net::HTTP.get('ifconfig.co', '/ip')
-  return extip.to_str
+  begin 
+    extIp = Net::HTTP.get('ifconfig.co', '/ip')
+    appendLogFile('extIp()',extIp)
+    return extIp.to_str
+  rescue
+    quietError('extIP()', 'Command Failed')
+  end
 end
 
 def intIp()
-  intip = IPSocket.getaddress(Socket.gethostname)
-  return intip.to_str
+  begin
+    intIp = IPSocket.getaddress(Socket.gethostname)
+    return intIp.to_str
+    appendLogFile('intIp()',intIp)
+  rescue
+    quietError('intIP()', 'Command Failed')
+  end
 end
 
 def hostname()
-  hostname = Socket.gethostname
-  return hostname.to_str
+  begin 
+    hostname = Socket.gethostname
+    return hostname.to_str
+    appendLogFile('hostname()',hostname) 
+  rescue
+    quietError('hostname()', 'Command Failed')
+  end 
 end
 
 def identity(data)
-  document = JSON.load(Net::HTTP.get('169.254.169.254', 'latest/dynamic/instance-identity/document'))
-  return document[data]
+  begin 
+    document = JSON.load(Net::HTTP.get('169.254.169.254', 'latest/dynamic/instance-identity/document'))
+    return document[data]
+    appendLogFile('identity(data)', document[data])
+  rescue
+    quietError('identity(data)', 'Command Failed')
+  end
 end
 
 def region()
@@ -67,5 +87,5 @@ def infoInstApiHandler()
   h.merge!('external-ip': extIp().gsub("\n",""))
   h.merge!('internal-ip': intIp())
   h.merge!('hostname': hostname())
-  return h.to_json
+  return h
 end

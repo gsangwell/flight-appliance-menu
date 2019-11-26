@@ -60,8 +60,13 @@ def shell(cmd)
 end
 
 def writeHashToYaml(hash,filepath)
-  File.open(filepath,"w") do |f|
-    f.write hash.to_yaml
+  begin 
+    File.open(filepath,"w") do |f|
+      f.write hash.to_yaml
+    end
+    appendLogFile("writeHashToYaml(hash,#{filepath})", hash.to_s)
+  rescue
+    quietError("writeHashToYaml(hash,#{filepath})",'Command Failed')
   end
 end
 
@@ -69,6 +74,12 @@ def appendLogFile(source,action)
   user = `whoami`
   out = "User: " + user.strip + " - " + source + " " + action
   $logger.info(out)
+end
+
+def quietError(source,action)
+  user = `whoami`
+  out = "User: " + user.strip + " - " + source + " " + action 
+  $logger.error(out)
 end
 
 def outputError(source,action)

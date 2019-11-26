@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#/usr/bin/env ruby
 #==============================================================================
 # Copyright (C) 2019-present Alces Flight Ltd.
 #
@@ -26,21 +26,30 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-def shutdown()
-  begin 
-    appendLogFile('shutdown()','')
-    sht = Open3.capture3('sudo shutdown -h 1')
-  rescue
-    outputError('shutdown', "Failed with response #{sht.to_s}")
+def shutdown_cli()
+  yn = $prompt.yes?("Are you sure you wish to shut down this instance?") do |q|
+    q.default false
+    q.positive "Y"
+    q.negative "N"
+  end
+  appendLogFile('shutdown_cli()', yn.to_s)
+  if yn
+    shutdown()
+  else 
+    main()
   end
 end
 
-def reboot()
-  appendLogFile('reboot()','')
-  rbt = Open3.capture3('shutdown -r 1')
-  if rbt[2].success?
-    appendLogFile('reboot()',"#{rbt}")
-  else
-    raise HandledError
+def reboot_cli()
+  yn = $prompt.yes?("Are you sure you wish to reboot this instance?") do |q|
+    q.default false
+    q.positive "Y"
+    q.negative "N"
+  end
+  appendLogFile('reboot_cli()', yn.to_s)
+  if yn
+    reboot()
+  else 
+    main()
   end
 end

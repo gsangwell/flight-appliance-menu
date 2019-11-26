@@ -50,6 +50,14 @@ def usermenu()
   return sel
 end
 
+def viewusers()
+  if users = getUserList()
+    return outputTable("Users", users.zip)
+  else
+    return false
+  end
+end
+
 def promptUserPasswd()
   user = $prompt.select("Change Password - Choose a user: ", getUserList())
   password = checkPasswd()
@@ -75,6 +83,12 @@ def checkPasswd()
     rawPasswds = promptPasswd() 
   end
   return rawPasswds[0] 
+end
+
+def newUser()
+  user = getUser()
+  createUser(user[0],user[1])
+  setUserSSHKey(user[0],getKey())
 end
 
 def getUser()
