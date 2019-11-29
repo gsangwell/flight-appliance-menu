@@ -29,8 +29,6 @@
 def shutdown_cli()
   yn = $prompt.yes?("Are you sure you wish to shut down this instance?") do |q|
     q.default false
-    q.positive "Y"
-    q.negative "N"
   end
   appendLogFile('shutdown_cli()', yn.to_s)
   if yn
@@ -43,8 +41,6 @@ end
 def reboot_cli()
   yn = $prompt.yes?("Are you sure you wish to reboot this instance?") do |q|
     q.default false
-    q.positive "Y"
-    q.negative "N"
   end
   appendLogFile('reboot_cli()', yn.to_s)
   if yn

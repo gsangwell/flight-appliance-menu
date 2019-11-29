@@ -24,23 +24,24 @@
 #
 # For more information on Flight Appliance Menu, please visit:
 # https://github.com/alces-software/flight-appliance-menu
-#==============================================================================
+#
 
 def shutdown()
-  begin 
-    appendLogFile('shutdown()','')
-    sht = Open3.capture3('sudo shutdown -h 1')
-  rescue
-    outputError('shutdown', "Failed with response #{sht.to_s}")
+  appendLogFile('shutdown()','Shutdown requested')
+  rbt = Open3.capture3('sudo shutdown -h 1')
+  if rbt[2].success?
+    appendLogFile('shutdown()',"status #{sht}")
+  else
+    outputError('shutdown()', "Failed with response #{sht.to_s}")
   end
 end
 
 def reboot()
-  appendLogFile('reboot()','')
-  rbt = Open3.capture3('shutdown -r 1')
+  appendLogFile('reboot()','Reboot requested')
+  rbt = Open3.capture3('sudo shutdown -r 1')
   if rbt[2].success?
-    appendLogFile('reboot()',"#{rbt}")
+    appendLogFile('reboot()',"status #{rbt}")
   else
-    raise HandledError
+    outputError('reboot()', "Failed with response #{rbt.to_s}")
   end
 end
