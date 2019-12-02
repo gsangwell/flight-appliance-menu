@@ -27,6 +27,7 @@
 #==============================================================================
 
 $logFileLocation = File.open('/var/log/alces/flightappmenu',"a")
+$logFileLocation.sync = true
 $logger = Logger.new($logFileLocation)
 $logger_stderr = Logger.new(STDERR)
 
