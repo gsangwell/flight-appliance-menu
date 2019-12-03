@@ -1,0 +1,2 @@
+#!/bin/bash 
+/opt/flight/bin/ruby /opt/flight/opt/appliance/bin/api.rb $@

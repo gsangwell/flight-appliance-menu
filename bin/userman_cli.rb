@@ -50,6 +50,14 @@ def usermenu()
   return sel
 end
 
+def viewusers()
+  if users = getUserList()
+    return outputTable("Users", users.zip)
+  else
+    return false
+  end
+end
+
 def promptUserPasswd()
   user = $prompt.select("Change Password - Choose a user: ", getUserList())
   password = checkPasswd()
@@ -77,17 +85,10 @@ def checkPasswd()
   return rawPasswds[0] 
 end
 
-def getUserList()
-  userlist = `sudo lid -g operators`.split
-  userlist.each_with_index do |e,i|
-    userlist[i] = e.gsub(/\(.*\)/, '')
-  end
-  return userlist 
-end
-
-def viewusers()
-  users = getUserList()
-  return outputTable("Users", users.zip)
+def newUser()
+  user = getUser()
+  createUser(user[0],user[1])
+  setUserSSHKey(user[0],getKey())
 end
 
 def getUser()
@@ -103,57 +104,7 @@ def getUser()
   return user
 end
 
-def newUser()
-  user = getUser()
-  createUser(user[0],user[1])
-  setUserSSHKey(user[0],getKey())
-end
-
-def createUser(uname,fname)
-  Open3.capture3("sudo \/sbin\/useradd #{uname} -G operators --comment \"#{fname}\" --shell #{$app_root}/bin/flightusershell.rb")
-end
-
 def getKey()
   key = $prompt.multiline("User's public SSH key", help: "(Paste user's public key here and press CTRL+D to end)")
   return key
-end
-
-#Currently unused - used for reading keys from files.
-def readKeyFromFile(file)
-  key = []
-  key << File.read(File.expand_path(file))
-  return key.first
-end
-
-def setUserSSHKey(uname, key)
-  begin
-    FileUtils.mkdir_p "/home/#{uname}/.ssh"
-    f = File.open("/home/#{uname}/.ssh/authorized_keys", 'w')
-    f.write(key)
-    f.chmod(0600)
-    f.close
-    FileUtils.chown(uname, uname, "/home/#{uname}/.ssh")
-    FileUtils.chmod(0700, "/home/#{uname}/.ssh") 
-    FileUtils.chown(uname, uname, "/home/#{uname}/.ssh/authorized_keys")
-    return true 
-  rescue
-    return false
-  end
-end
-
-def deleteUser(user)
-  Open3.capture3("\/sbin\/userdel -f #{user}")
-end
-
-def deleteUserHandler(user)
-  begin
-    deleteUserStatus = deleteUser(user)
-    if deleteUserStatus[2].success?
-      return true
-    else
-      return false
-    end
-  rescue 
-    raise StandardError
-  end
 end

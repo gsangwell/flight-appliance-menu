@@ -26,28 +26,46 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-require 'tty'
-require 'tty-prompt'
-require 'tty-spinner'
-require 'artii'
+#require 'tty'
+#require 'tty-prompt'
+#require 'tty-spinner'
+#require 'artii'
 require 'net/http'
 require 'net/ping'
 require 'resolv'
-require 'terminal-table'
+#require 'terminal-table'
 require 'yaml'
 require 'json'
 require 'open3'
 require 'fileutils'
 require 'erb'
+require 'logger'
 
 require 'common'
-require 'userman'
-require 'engmode'
-require 'info'
-require 'shutdown'
-require 'cluster'
+require 'userman_core'
+require 'engmode_core'
+require 'info_core'
+require 'shutdown_core'
+require 'vpn_core'
 
 def setup()
+  appendLogFile('------- setup() - Application Initialized, invocation source is', $INVOKE_SRC)
+  if $INVOKE_SRC.include? 'cli'
+    require 'tty'
+    require 'tty-prompt'
+    require 'tty-spinner'
+    require 'artii'
+    require 'terminal-table'
+    require 'cli_common'
+    require 'cli_core'
+    require 'info_cli'
+    require 'userman_cli'
+    require 'vpn_cli'
+    require 'shutdown_cli'
+  elsif ! $INVOKE_SRC.include? 'api'
+    #Any requires for API Functionality.
+  end
+  
   bios = `sudo /usr/sbin/dmidecode -s bios-version | /bin/tr "[:upper:]" "[:lower:]" | /bin/grep "amazon"`
   azure = `sudo /usr/sbin/dmidecode -s chassis-manufacturer`
   if bios.include? "amazon"
@@ -58,12 +76,19 @@ def setup()
     provider = 'other'
   end
 
+  appendLogFile('setup() Detected Provider is:', provider)
+
   if provider == 'aws'
-    require 'aws.rb'
+    require 'aws_core'
+    if $INVOKE_SRC.include? 'cli'
+      require 'aws_cli'
+    end
   elsif provider == 'azure'
-    require 'azure.rb'
+    require 'azure_core'
+    if $INVOKE_SRC.include? 'cli'
+      require 'azure_cli'
+    end
   else 
     puts "Unsupported cloud service"
   end
 end
-

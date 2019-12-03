@@ -27,62 +27,75 @@
 #==============================================================================
 
 def platform()
-  return "Amazon AWS"
+  return "Microsoft Azure"
 end
 
 def extIp()
-  extip = Net::HTTP.get('ifconfig.co', '/ip')
-  return extip.to_str
+  begin 
+    extIp = Net::HTTP.get('ifconfig.co', '/ip')
+    appendLogFile('extIp()',extIp)
+    return extIp.to_str
+  rescue
+    quietError('extIP()', 'Command Failed')
+  end
 end
 
+#def extIp()
+#  extIp = Net::HTTP.get('ifconfig.co', '/ip')
+#  return extIp.to_str
+#end
+
 def intIp()
-  intip = IPSocket.getaddress(Socket.gethostname)
-  return intip.to_str
+  begin
+    intIp = IPSocket.getaddress(Socket.gethostname)
+    appendLogFile('intIp()',intIp)
+    return intIp.to_str
+  rescue
+    quietError('intIp()', 'Command Failed')
+  end
 end
 
 def hostname()
-  hostname = Socket.gethostname
-  return hostname.to_str
+  begin 
+    hostname = Socket.gethostname
+    appendLogFile('hostname()',hostname)
+    return hostname.to_str
+  rescue
+    quietError('hostname()','Command Failed')
+  end
 end
 
-def identity(data)
-  document = JSON.load(Net::HTTP.get('169.254.169.254', 'latest/dynamic/instance-identity/document'))
-  return document[data]
+def identity()
+  begin 
+    uri = URI('http://169.254.169.254/metadata/instance?api-version=2019-03-11')
+    req = Net::HTTP::Get.new(uri)
+    req['Metadata'] = true
+    response = Net::HTTP.start(uri.hostname, uri.port) {|http|
+      http.request(req)
+    }
+    document = JSON.load(response.body)
+    appendLogFile('identity()',document.to_s)
+    return document
+  rescue
+    quietError('identity()','Command Failed')
+  end
 end
 
 def region()
-  return identity('region')
+  return identity['compute']['location']
 end
 
 def instanceType()
-  return identity('instanceType')
-end
-
-def infoInst()
-  infoInstTable=infoInstTableGenerate()
-  puts outputTable(infoInstTable[0], infoInstTable[1])
-end
-
-def infoInstTableGenerate()
-  table = []
-  table << ['Platform', "Amazon AWS"]
-  table << ['Availability Zone', identity('availabilityZone')]
-  table << ['Instance Type', identity('instanceType')]
-  table << ['External IP Address', extIp()]
-  table << ['Internal IP Address', intIp()]
-  table << ['Hostname', hostname()]
-  title = "Instance Information"
-  ary = [title, table]
-  return ary
+  return identity['compute']['vmSize']
 end
 
 def infoInstApiHandler()
   h = {}
   h.merge!('platform': platform())
-  h.merge!('availability-zone': identity('availabilityZone'))
-  h.merge!('instance-type': identity('instanceType'))
+  h.merge!('region': region())
+  h.merge!('instance-type': instanceType())
   h.merge!('external-ip': extIp().gsub("\n",""))
   h.merge!('internal-ip': intIp())
   h.merge!('hostname': hostname())
-  return h.to_json
+  return h
 end

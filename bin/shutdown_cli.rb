@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#/usr/bin/env ruby
 #==============================================================================
 # Copyright (C) 2019-present Alces Flight Ltd.
 #
@@ -26,34 +26,26 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-def engmode()
-   user = `whoami`
-   setShell = Open3.capture3("sudo /sbin/usermod engineer --shell /bin/bash")
-   
-   script = <<~SCRIPT
-   #!/bin/bash
-   sudo /sbin/usermod engineer --shell /sbin/nologin
-   rm /tmp/disable.sh
-   SCRIPT
-   f = File.open("/tmp/disable.sh", 'w')
-   f.puts script
-   f.close
-   createJob = Open3.capture3("sudo at now + 1 hour -f /tmp/disable.sh")
-   status = []
-   status << setShell
-   status << createJob
-   return status
+def shutdown_cli()
+  yn = $prompt.yes?("Are you sure you wish to shut down this instance?") do |q|
+    q.default false
+  end
+  appendLogFile('shutdown_cli()', yn.to_s)
+  if yn
+    shutdown()
+  else 
+    main()
+  end
 end
 
-def engModeHandler(status)
-   begin
-      #Open3.capture3 above returns an array with a Process::Status object in position[2]. 
-      #Check whether both commands completed successfully with the success? command which
-      #Is true when the status is 0, false if not zero, nil if not set.
-      if status[0][2].success? && status[1][2].success?
-         return {'status' => true}
-      else
-         return response = {'status' => false, 'stdout' => status[0][0] + status[1][0], 'stderr' => status[0][1] + status[1][1]} 
-      end
-   end
+def reboot_cli()
+  yn = $prompt.yes?("Are you sure you wish to reboot this instance?") do |q|
+    q.default false
+  end
+  appendLogFile('reboot_cli()', yn.to_s)
+  if yn
+    reboot()
+  else 
+    main()
+  end
 end

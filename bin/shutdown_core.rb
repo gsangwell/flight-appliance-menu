@@ -1,4 +1,4 @@
-#!/opt/flight/bin/ruby
+#!/usr/bin/env ruby
 #==============================================================================
 # Copyright (C) 2019-present Alces Flight Ltd.
 #
@@ -24,7 +24,24 @@
 #
 # For more information on Flight Appliance Menu, please visit:
 # https://github.com/alces-software/flight-appliance-menu
-#==============================================================================
+#
 
-$app_root = File.expand_path(__dir__ + '/..')
-load "#{$app_root}/bin/cli.rb"
+def shutdown()
+  appendLogFile('shutdown()','Shutdown requested')
+  rbt = Open3.capture3('sudo shutdown -h 1')
+  if rbt[2].success?
+    appendLogFile('shutdown()',"status #{sht}")
+  else
+    outputError('shutdown()', "Failed with response #{sht.to_s}")
+  end
+end
+
+def reboot()
+  appendLogFile('reboot()','Reboot requested')
+  rbt = Open3.capture3('sudo shutdown -r 1')
+  if rbt[2].success?
+    appendLogFile('reboot()',"status #{rbt}")
+  else
+    outputError('reboot()', "Failed with response #{rbt.to_s}")
+  end
+end

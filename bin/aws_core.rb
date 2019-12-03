@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#/usr/bin/env ruby
 #==============================================================================
 # Copyright (C) 2019-present Alces Flight Ltd.
 #
@@ -26,66 +26,66 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-$logFileLocation = File.open('/var/log/alces/flightappmenu',"a")
-$logFileLocation.sync = true
-$logger = Logger.new($logFileLocation)
-$logger_stderr = Logger.new(STDERR)
-
-
-#def checkUserGroup(user)
-#  response = Open3.capture3('groups #{user}')
-#  if response[2].success? 
-#    groups = response[0].slice(response[0].index(":")..1)
-#    return groups
-#  else
-#    return false
-#  end
-#end
-
-def loginsh
-  shell('/bin/bash -l')
+def platform()
+  return "Amazon AWS"
 end
 
-def flsh
-  shell('/opt/flight/bin/flight shell')
-end
-
-def shell(cmd)
-  pid = spawn(cmd)
-  begin
-    Process::wait pid
-  rescue
-    Process::kill('INT', pid)
-    retry
-  end
-end
-
-def writeHashToYaml(hash,filepath)
+def extIp()
   begin 
-    File.open(filepath,"w") do |f|
-      f.write hash.to_yaml
-    end
-    appendLogFile("writeHashToYaml(hash,#{filepath})", hash.to_s)
+    extIp = Net::HTTP.get('ifconfig.co', '/ip')
+    appendLogFile('extIp()',extIp)
+    return extIp.to_str
   rescue
-    quietError("writeHashToYaml(hash,#{filepath})",'Command Failed')
+    quietError('extIP()', 'Command Failed')
   end
 end
 
-def appendLogFile(source,action)
-  user = `whoami`
-  out = "User: " + user.strip + " - " + source + " " + action
-  $logger.info(out)
+def intIp()
+  begin
+    intIp = IPSocket.getaddress(Socket.gethostname)
+    return intIp.to_str
+    appendLogFile('intIp()',intIp)
+  rescue
+    quietError('intIP()', 'Command Failed')
+  end
 end
 
-def quietError(source,action)
-  user = `whoami`
-  out = "User: " + user.strip + " - " + source + " " + action 
-  $logger.error(out)
+def hostname()
+  begin 
+    hostname = Socket.gethostname
+    return hostname.to_str
+    appendLogFile('hostname()',hostname) 
+  rescue
+    quietError('hostname()', 'Command Failed')
+  end 
 end
 
-def outputError(source,action)
-  user = `whoami`
-  out = "User: " + user.strip + " - " + source + " " + action
-  $logger.error(out)
-  $logger_stderr.error(out)
+def identity(data)
+  begin 
+    document = JSON.load(Net::HTTP.get('169.254.169.254', 'latest/dynamic/instance-identity/document'))
+    return document[data]
+    appendLogFile('identity(data)', document[data])
+  rescue
+    quietError('identity(data)', 'Command Failed')
+  end
+end
+
+def region()
+  return identity('region')
+end
+
+def instanceType()
+  return identity('instanceType')
+end
+
+
+def infoInstApiHandler()
+  h = {}
+  h.merge!('platform': platform())
+  h.merge!('availability-zone': identity('availabilityZone'))
+  h.merge!('instance-type': identity('instanceType'))
+  h.merge!('external-ip': extIp().gsub("\n",""))
+  h.merge!('internal-ip': intIp())
+  h.merge!('hostname': hostname())
+  return h
 end
