@@ -33,6 +33,7 @@
 require 'net/http'
 require 'net/ping'
 require 'resolv'
+require 'socket'
 #require 'terminal-table'
 require 'yaml'
 require 'json'
@@ -68,10 +69,15 @@ def setup()
   
   bios = `sudo /usr/sbin/dmidecode -s bios-version | /bin/tr "[:upper:]" "[:lower:]" | /bin/grep "amazon"`
   azure = `sudo /usr/sbin/dmidecode -s chassis-manufacturer`
+  systemd = `/usr/bin/systemd-detect-virt`
   if bios.include? "amazon"
     provider = 'aws'
   elsif azure.include? "Microsoft"
     provider = 'azure'
+  elsif systemd.include? 'none'
+    provider = 'metal'
+  elsif systemd.include? 'vmware'
+    provider = 'metal'
   else
     provider = 'other'
   end
@@ -87,6 +93,11 @@ def setup()
     require 'azure_core'
     if $INVOKE_SRC.include? 'cli'
       require 'azure_cli'
+    end
+  elsif provider == 'metal'
+    require 'metal_core'
+    if $INVOKE_SRC.include? 'cli'
+      require 'metal_cli'
     end
   else 
     puts "Unsupported cloud service"
