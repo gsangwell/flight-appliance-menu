@@ -14,7 +14,7 @@ else
     exit 1
 fi
 
-/opt/flight/opt/appliance/bin/api.rb extIp
+/opt/flight/bin/ruby /opt/flight/opt/appliance/bin/api.rb extIp
 
 chmod +x /var/lib/firstrun/scripts/*
 exec /var/lib/firstrun/scripts/appliancegui.bash

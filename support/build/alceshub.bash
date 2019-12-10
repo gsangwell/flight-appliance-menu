@@ -9,7 +9,7 @@ fi
 
 ########Base Packages###########
 yum -y install patch autoconf automake bison bzip2 gcc-c++ libffi-devel libtool \
-patch readline-devel ruby sqlite-devel zlib-devel glibc-headers glibc-devel openssl-devel make unzip wget git
+patch readline-devel ruby sqlite-devel zlib-devel glibc-headers glibc-devel openssl-devel make unzip wget git yum-utils
 yum -y install epel-release
 yum -y install openvpn easy-rsa bind-utils
 
