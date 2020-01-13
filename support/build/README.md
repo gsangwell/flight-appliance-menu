@@ -27,4 +27,7 @@ This should return a JSON string showing the external IP address of the machine.
 
 Once the instance has the correct IP configuration for it's intended destination, the machine needs to be personalized to generate keys and certificates required for VPNs. 
 
-1. Navigate to the 
+## TODO - Ensure that there's a metal build of the RPMs that includes the support/build directory to
+
+1. Navigate to the /var/lib/firstrun/scripts
+2. Run the vpn.bash script once network connections are up.
