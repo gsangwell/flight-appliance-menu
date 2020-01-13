@@ -94,5 +94,6 @@ def dns(*type)
     end
   rescue
     quietError("dns(#{type})", dns.to_s)
+    return "No DNS"
   end
 end

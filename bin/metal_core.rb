@@ -79,5 +79,9 @@ rescue
 end
 
 def region()
-  return ipInfo['country']
+  if q = ipInfo()
+    return q['country']
+  else 
+    return false
+  end
 end

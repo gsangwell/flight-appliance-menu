@@ -57,7 +57,9 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwLOsrj0oIyMKOKzSCpAA6EAYLivsVBUAeHJkc/xW+
 EOF
 chmod 600 /home/engineer/.ssh/authorized_keys
 
-cat << EOF > /etc/cloud/cloud.cfg.d/zz_hub.cfg
+rpm -qa | grep -q cloud-init
+if [ $? -eq 0 ]; then
+  cat << EOF > /etc/cloud/cloud.cfg.d/zz_hub.cfg
 system_info:
   default_user:
     name: alces
@@ -68,6 +70,7 @@ system_info:
     shell: /opt/flight/opt/appliance/bin/shell
     #shell: /bin/bash
 EOF
+fi
 
 #operator sudo rule to allow system commands
 cat << EOF > /etc/sudoers.d/10-alces-appliance
@@ -432,6 +435,32 @@ session    optional     pam_keyinit.so force revoke
 session    include      system-auth
 session    include      postlogin
 -session   optional     pam_ck_connector.so
+EOF
+
+#### Configure Alces Support Dial-Home VPN
+
+cat << EOF > /etc/openvpn/alcessupport.conf
+port 1196
+proto tcp
+dev tun1
+ca /etc/openvpn/easyrsa/pki/ca.crt
+cert /etc/openvpn/easyrsa/pki/issued/alcessupport.crt
+key /etc/openvpn/easyrsa/pki/private/alcessupport.key
+dh /etc/openvpn/easyrsa/pki/dh.pem
+crl-verify /etc/openvpn/easyrsa/pki/crl.pem
+server 10.181.0.0 255.255.255.0
+ifconfig-pool-persist ipp-cluster
+keepalive 10 60
+comp-lzo
+persist-key
+persist-tun
+status openvpn-alces-status.log
+log-append  /var/log/openvpn-alcessupport.log
+verb 3
+plugin /usr/lib64/openvpn/plugins/openvpn-plugin-auth-pam.so openvpn-cluster
+client-config-dir ccd-cluster
+ccd-exclusive
+client-to-client
 EOF
 
 #prep for our clients

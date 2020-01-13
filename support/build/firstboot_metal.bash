@@ -17,6 +17,12 @@ fi
 /opt/flight/bin/ruby /opt/flight/opt/appliance/bin/api.rb extIp
 
 chmod +x /var/lib/firstrun/scripts/*
-exec /var/lib/firstrun/scripts/appliancegui.bash
-exec /var/lib/firstrun/scripts/ssl-certs.bash
-exec /var/lib/firstrun/scripts/vpn.bash
+./var/lib/firstrun/scripts/appliancegui.bash
+./var/lib/firstrun/scripts/ssl-certs.bash
+./var/lib/firstrun/scripts/vpn.bash
+
+cat << EOF > /opt/flight/opt/appliance/bin/clilaunch
+#!/bin/bash
+chvt 3
+export PATH=/usr/bin/:$PATH ; setsid sh -c '/opt/flight/bin/ruby /opt/flight/opt/appliance/bin/cli.rb $@ <> /dev/tty3 >&0 2>&1'
+EOF
