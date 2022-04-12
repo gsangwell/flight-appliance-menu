@@ -37,8 +37,7 @@ end
 
 def extDNS
   begin
-    ssl_name=`echo $(basename $(echo /opt/flight/etc/ssl/certs-hub-*) | sed 's/^certs-//g')`.chomp
-    dnsName = "https://#{ssl_name}.appliance.alces.network"
+    dnsName = "https://#{$config['appliance_name']}.appliance.alces.network"
   rescue
     quietError("extDNS()", "Could not get SSL name")
     return false

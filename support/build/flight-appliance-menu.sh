@@ -141,3 +141,12 @@ chown root:operators /var/log/alces
 chown root:operators /var/log/alces/flightappmenu
 chmod 775 /var/log/alces
 chmod 664 /var/log/alces/flightappmenu
+
+######## Configure menu system ##############
+appliance_name = "appliance-$(uuid -v4 | cut -f1 -d'-')"
+host_name = "${appliance_name}.appliance.alces.network"
+
+sed -i "s/appliance_name:/appliance_name: ${appliance_name}/g" /opt/appliance/cfg/config.yaml
+
+######## Set hostname ##############
+hostnamectl set-hostname "$hostname"
