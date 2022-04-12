@@ -43,9 +43,8 @@ end
 def intIp()
   begin
     intIp = Socket.ip_address_list.detect{|intf| intf.ipv4_private?}
-    intIp.ip_address
-    appendLogFile('intIp()',intIp)
-    return ip.ip_address
+    appendLogFile('intIp()',intIp.ip_address)
+    return intIp.ip_address
   rescue
     quietError('intIP()', 'Command Failed')
   end

@@ -78,6 +78,8 @@ def setup()
     provider = 'metal'
   elsif systemd.include? 'vmware'
     provider = 'metal'
+  elsif systemd.include? 'kvm'
+    provider = 'metal'
   else
     provider = 'other'
   end

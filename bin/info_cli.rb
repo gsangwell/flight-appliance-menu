@@ -52,8 +52,8 @@ def inetStatTableGenerate()
   table << ['Ping 8.8.8.8? ', pingIp()]
   table << ['Resolve alces-software.com? ', resolv('alces-software.com')]
   table << ['Default Gateway', gw()]
-  table << ['Primary DNS Server', dns('nameserver').first]
-  table << ['Search Domain', dns('search').first]
+  table << ['DNS Servers', dns('nameserver').join(", ")]
+  table << ['Search Domains', dns('search').join(", ")]
   table << ['External URL', extDNS]
   title = "Internet Connectivity Information"
   ary = [title, table]
