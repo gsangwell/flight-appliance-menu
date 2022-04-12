@@ -209,111 +209,6 @@ def apiReboot(inputJson)
   end
 end
 
-def apiVpnStatus()
-  hash = {}
-  begin
-    vpns = getVpnList()
-    hash.merge! 'vpns' => vpns
-    hash.merge! 'status' => true
-  rescue 
-    hash = {'status' => false}
-  end
-  return hash
-end
-
-def apiVpnSlotsAvail()
-  hash = {}
-  begin
-    ary = slotListAvail.keys
-    hash.merge! 'slots' => ary
-    hash.merge! 'status' => true
-  rescue
-    hash = {'status' => false}
-  end
-  return hash
-end
-
-def apiVpnAssign(inputJson)
-  begin
-    hash = JSON.parse(inputJson)
-    if ! hash['vpn'].nil? && ! hash['clientname'].nil?
-      clientname = hash['clientname']
-      vpnslot = hash['vpn']
-      if assignSlot(clientname,vpnslot)
-        return {'status' => true} 
-      else 
-        return {'status' => false}
-      end
-    else 
-      return {'status' => false}
-    end
-  rescue
-    return {'status' => false} 
-  end
-
-end
-
-def apiVpnViewClientScript(inputJson)
-  begin
-    hash = JSON.parse(inputJson)
-    outhash = {}
-    if ! hash['vpn'].nil?
-      vpnslot = hash['vpn']
-      script = getVPNClientScript(vpnslot)
-      if ! script.nil?
-        outhash.merge! vpnslot => getVPNClientScript(vpnslot)
-        outhash.merge! 'status' => true
-        return outhash
-      else
-        return {'status' => false}
-      end
-    else
-      return {'status' => false}
-    end 
-  rescue
-    return {'status' => false}
-  end 
-end
-
-def apiVpnGeneratePassword(inputJson)
-  outhash = {}
-  begin
-    hash = JSON.parse(inputJson)
-    if ! hash['vpn'].nil?
-      slot = hash['vpn']
-      newPass = genClientPasswd(slot)
-      if ! newPass.nil?
-        outhash.merge! slot => newPass
-        outhash.merge! 'status' => true
-      else
-        fail
-      end
-    else 
-      fail
-    end
-  rescue
-    return {'status' => false} 
-  end
-end
-
-def apiVpnDeconfigure(inputJson)
-  begin
-    hash = JSON.parse(inputJson)
-    if ! hash['vpn'].nil? && hash['deconfigure'] == true
-      oldvpn = hash['vpn']
-      if deconfigureVPNClient(oldvpn)
-        return {'status' => true}
-      else
-        return {'status' => false}
-      end
-    else
-      return {'status' => false}
-    end
-  rescue
-    return {'status' => false}
-  end
-end 
-
 def apiHelp()
   <<~HEREDOC
 
@@ -331,12 +226,6 @@ def apiHelp()
     - userGetList - Return list of system users.
     - userSetPasswd - Set the user's password - requires '{"user-name":"<System username>","passwd":"<User's password>"}'
     - userDelete - Delete a user from the system - requires '{"user-name":"<System username>","delete":true}'
-    - vpnStatus - View VPN connection status
-    - vpnSlotsAvail - View VPN slots that are not yet configured
-    - vpnAssign - Assign VPN slot to client - requires '{"vpn":"<available-vpn-slot>","clientname":"<clientname>"}' 
-    - vpnViewClientScript - View the connection script for a client '{"vpn":"<assigned-vpn-slot>"}' 
-    - vpnGeneratePassword - Generate password for client '{"vpn":"<available-vpn-slot>"}' 
-    - vpnDeconfigure - Deconfigure VPN slot associated to a client '{"vpn":"<available-vpn-slot>","deconfigure":true}' 
     - shutdown - Shut down the instance - requires '{"shutdown":true}'
     - reboot - Restart the instance - requires '{"reboot":true}' 
 
@@ -370,18 +259,6 @@ begin
     response = apiUserSetPasswd(ARGV[1])
   when 'userDelete'
     response = apiUserDelete(ARGV[1])
-  when 'vpnStatus'
-    response = apiVpnStatus()
-  when 'vpnSlotsAvail'
-    response = apiVpnSlotsAvail()
-  when 'vpnAssign'
-    response = apiVpnAssign(ARGV[1])
-  when 'vpnViewClientScript'
-    response = apiVpnViewClientScript(ARGV[1])
-  when 'vpnGeneratePasswd'
-    response = apiVpnGeneratePassword(ARGV[1])
-  when 'vpnDeconfigure'
-    response = apiVpnDeconfigure(ARGV[1])
   when 'shutdown'
     response = apiShutdown(ARGV[1])
   when 'reboot'

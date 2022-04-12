@@ -83,9 +83,11 @@ def dns(*type)
     dns = Resolv::DNS::Config.default_config_hash
     case type[0]
     when 'nameserver'
-      return dns[:nameserver]
+      return dns[:nameserver] if !dns[:nameserver].nil?
+      return []
     when 'search'
-      return dns[:search]
+      return dns[:search] if !dns[:search].nil?
+      return []
     else
       hash = {}
       hash.merge!(nameservers: dns[:nameserver])

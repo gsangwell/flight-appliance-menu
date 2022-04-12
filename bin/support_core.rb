@@ -26,57 +26,22 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-#trap('INT') { puts "Quitting..."; exit }
-
-ascprint = Artii::Base.new :font => 'slant'
-welcome = ascprint.asciify('Alces Hub')
-puts welcome
-
-
-$prompt = TTY::Prompt.new
-
-def mainmenu()
-  sel = $prompt.select('What would you like to do?') do |menu|
-    menu.choice 'View System Information', 'info'
-    menu.choice 'User Management', 'uman'
-    menu.choice "Flight Management Console", 'flsh'
-    menu.choice 'Alces Remote Assistance', 'support'
-    menu.choice 'Launch console', 'console'
-    menu.choice 'Exit menu', 'getout'
-    menu.choice 'Reboot Alces Hub', 'reboot'
-    menu.choice 'Shutdown Alces Hub', 'shutdown'
-   end
-  return sel
+def getSupportStatus()
+ return `systemctl status openvpn@alces-support | grep Active | awk '{print $2}'`.strip == "active"
 end
 
-def getout()
-  exit
+def getSupportEnabledSince()
+  return `systemctl status openvpn@alces-support | grep "Active" | cut -f2 -d';'`.strip
 end
 
-def main()
-  loop do
-    puts "\n"
-    case mainmenu()
-    when 'info'
-      infomenu()
-    when 'uman'
-      usermanager()
-    when 'flsh'
-      flsh()      
-    when 'support'
-      support_cli()
-    when 'shutdown'
-      shutdown_cli()
-    when 'reboot'
-      reboot_cli()
-    when 'getout'
-      getout()
-    when 'client'
-      client()
-    when 'console'
-      loginsh
-    else
-      puts 'invalid'
-    end
-  end
+def enableRemoteSupport()
+  `sudo systemctl start openvpn@alces-support`
+end
+
+def disableRemoteSupport()
+  `sudo systemctl stop openvpn@alces-support`
+end
+
+def pingRemoteSupport()
+  return `ping -c1 -W1 10.178.0.1 >/dev/null; echo $?`.strip == "0"
 end
