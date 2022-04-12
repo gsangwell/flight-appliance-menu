@@ -44,7 +44,6 @@ require 'logger'
 
 require 'common'
 require 'userman_core'
-require 'engmode_core'
 require 'info_core'
 require 'shutdown_core'
 require 'support_core'
