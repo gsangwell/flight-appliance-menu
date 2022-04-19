@@ -24,24 +24,49 @@
 #
 # For more information on Flight Appliance Menu, please visit:
 # https://github.com/alces-software/flight-appliance-menu
-#
+#==============================================================================
 
-def shutdown()
-  appendLogFile('shutdown()','Shutdown requested')
-  rbt = Open3.capture3('sudo shutdown -h 1')
-  if rbt[2].success?
-    appendLogFile('shutdown()',"status #{sht}")
-  else
-    outputError('shutdown()', "Failed with response #{sht.to_s}")
+def getNetworkInterfaces()
+  output = `/sbin/ip addr`
+  interfaces = []
+
+  output.each_line.with_index do |line,i|
+    if line.match(/^[0-9]+:/)
+      name = line.match(/^[0-9]+: ([a-zA-Z0-9]*):/)[1]
+      next if ['lo', 'tun0'].include?(name)
+      interfaces << name
+    end
   end
+
+  return interfaces
 end
 
-def reboot()
-  appendLogFile('reboot()','Reboot requested')
-  rbt = Open3.capture3('sudo shutdown -r 1')
-  if rbt[2].success?
-    appendLogFile('reboot()',"status #{rbt}")
-  else
-    outputError('reboot()', "Failed with response #{rbt.to_s}")
+def getInterfaceDetails(name)
+  output = `/sbin/ip addr show dev #{name}`
+
+  interface = {}
+  interface['name'] = name
+  interface['ipv4'] = []
+
+  output.each_line do |line|
+    if line.match(/    inet [0-9.\/]* [a-zA-Z]/)
+      interface['ipv4'] << line.match(/    inet ([0-9.\/]*) [a-zA-Z]/)[1]
+    end
   end
+
+  interface['status'] = `cat /sys/class/net/eth0/subsystem/#{name}/operstate`.chomp
+  interface['mac'] = `cat /sys/class/net/eth0/subsystem/#{name}/address`.chomp
+  interface['firewall_zone'] = `firewall-cmd --get-zone-of-interface #{name}`.chomp
+
+
+  return interface
+end
+
+def getAllInterfaceDetails()
+  interfaces = []
+  getNetworkInterfaces().each do |name|
+    interface = getInterfaceDetails(name)
+    interfaces << interface
+  end
+  return interfaces
 end

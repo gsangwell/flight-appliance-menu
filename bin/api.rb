@@ -245,6 +245,31 @@ def apiSupportPing()
   end
 end
 
+def apiNetworkInterfaceList()
+  return {'interfaces' => getNetworkInterfaces()}
+end
+
+def apiNetworkInterfaceDetails(inputJson)
+  begin
+    hash = JSON.parse(inputJson)
+  rescue
+    return {'status' => false}
+  end
+  if ! hash['interface'].nil?
+    begin
+      return {'interface' => getInterfaceDetails(hash['interface'])}
+    rescue
+      return {'interface' => hash['interface'], 'invalid' => true}
+    end
+  else
+    return {'status' => false}
+  end
+end
+
+def apiNetworkAllInterfaceDetails()
+  return {'interfaces' => getAllInterfaceDetails()}
+end
+
 def apiHelp()
   <<~HEREDOC
 
@@ -266,6 +291,9 @@ def apiHelp()
     - supportEnable - Enable the Alces Support VPN.
     - supportDisable - Disable the Alces Support VPN.
     - supportPing - Check connectivity to the Alces Support hub.
+    - networkInterfaceList - Return a list of network interfaces.
+    - networkInterfaceDetails - Return the details of a specific network interface - requires '{"interface": "<dev>"}'
+    - networkAllInterfaceDetails - Return the details of all network interfaces.
     - shutdown - Shut down the instance - requires '{"shutdown":true}'
     - reboot - Restart the instance - requires '{"reboot":true}' 
 
@@ -307,6 +335,12 @@ begin
     response = apiSupportDisable()
   when 'supportPing'
     response = apiSupportPing()
+  when 'networkInterfaceList'
+    response = apiNetworkInterfaceList() 
+  when 'networkInterfaceDetails'
+    response = apiNetworkInterfaceDetails(ARGV[1])
+  when 'networkAllInterfaceDetails'
+    response = apiNetworkAllInterfaceDetails()
   when 'shutdown'
     response = apiShutdown(ARGV[1])
   when 'reboot'

@@ -26,54 +26,22 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-#trap('INT') { puts "Quitting..."; exit }
-
-ascprint = Artii::Base.new :font => 'slant'
-welcome = ascprint.asciify('Alces Hub')
-puts welcome
-
-
-$prompt = TTY::Prompt.new
-
-def mainmenu()
-  sel = $prompt.select('What would you like to do?') do |menu|
-    menu.choice 'View System Information', 'info'
-    menu.choice 'User Management', 'uman'
-    menu.choice 'Network Management', 'network'
-    menu.choice 'Power Management', 'power'
-    menu.choice 'Alces Remote Assistance', 'support'
-    menu.choice 'Launch console', 'console'
-    menu.choice 'Exit menu', 'getout'
-   end
-  return sel
+def shutdown()
+  appendLogFile('shutdown()','Shutdown requested')
+  rbt = Open3.capture3('sudo shutdown -h 1')
+  if rbt[2].success?
+    appendLogFile('shutdown()',"status #{sht}")
+  else
+    outputError('shutdown()', "Failed with response #{sht.to_s}")
+  end
 end
 
-def getout()
-  exit
-end
-
-def main()
-  loop do
-    puts "\n"
-    case mainmenu()
-    when 'info'
-      infomenu()
-    when 'uman'
-      usermanager()
-    when 'network'
-      network_cli()
-    when 'power'
-      power_cli()
-    when 'support'
-      support_cli()
-    when 'getout'
-      getout()
-    when 'client'
-      client()
-    when 'console'
-      loginsh
-    else
-      puts 'invalid'
-    end
+def reboot()
+  appendLogFile('reboot()','Reboot requested')
+  rbt = Open3.capture3('sudo shutdown -r 1')
+  if rbt[2].success?
+    appendLogFile('reboot()',"status #{rbt}")
+  else
+    outputError('reboot()', "Failed with response #{rbt.to_s}")
   end
 end

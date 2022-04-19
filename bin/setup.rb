@@ -45,8 +45,9 @@ require 'logger'
 require 'common'
 require 'userman_core'
 require 'info_core'
-require 'shutdown_core'
 require 'support_core'
+require 'network_core'
+require 'power_core'
 
 def setup()
   appendLogFile('------- setup() - Application Initialized, invocation source is', $INVOKE_SRC)
@@ -60,8 +61,9 @@ def setup()
     require 'cli_core'
     require 'info_cli'
     require 'userman_cli'
-    require 'shutdown_cli'
     require 'support_cli'
+    require 'network_cli'
+    require 'power_cli'
   elsif ! $INVOKE_SRC.include? 'api'
     #Any requires for API Functionality.
   end

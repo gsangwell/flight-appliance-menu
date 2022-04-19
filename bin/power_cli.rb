@@ -1,4 +1,4 @@
-#/usr/bin/env ruby
+#!/usr/bin/env ruby
 #==============================================================================
 # Copyright (C) 2019-present Alces Flight Ltd.
 #
@@ -26,6 +26,22 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
+def power_cli()
+  sel = $prompt.select('Choose an option') do |menu|
+    menu.choice 'Shutdown Alces Hub', 'shutdown'
+    menu.choice 'Reboot Alces Hub', 'reboot'
+    menu.choice 'Return', 'ret'
+  end
+  case sel
+  when 'shutdown'
+    shutdown_cli()
+  when 'reboot'
+    reboot_cli()
+  when 'ret'
+    main()
+  end
+end
+
 def shutdown_cli()
   yn = $prompt.yes?("Are you sure you wish to shut down this instance?") do |q|
     q.default false
@@ -33,7 +49,7 @@ def shutdown_cli()
   appendLogFile('shutdown_cli()', yn.to_s)
   if yn
     shutdown()
-  else 
+  else
     main()
   end
 end
@@ -45,7 +61,7 @@ def reboot_cli()
   appendLogFile('reboot_cli()', yn.to_s)
   if yn
     reboot()
-  else 
+  else
     main()
   end
 end
