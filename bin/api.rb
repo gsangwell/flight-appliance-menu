@@ -209,6 +209,42 @@ def apiReboot(inputJson)
   end
 end
 
+def apiSupportStatus()
+  h = {}
+  h.merge!('status': getSupportStatus())
+  return h
+end
+
+def apiSupportEnabledSince()
+  h = {}
+  h.merge!('enabled-since': getSupportEnabledSince())
+  return h
+end
+
+def apiSupportEnable()
+  if enableRemoteSupport()
+    return {'status' => true}
+  else
+    return {'status' => false}
+  end
+end
+
+def apiSupportDisable()
+  if disableRemoteSupport()
+    return {'status' => true}
+  else
+    return {'status' => false}
+  end
+end
+
+def apiSupportPing()
+  if getSupportStatus()
+    return {'status' => pingRemoteSupport()}
+  else
+    return {'status' => false}
+  end
+end
+
 def apiHelp()
   <<~HEREDOC
 
@@ -220,12 +256,16 @@ def apiHelp()
     - intIp - Return Internal IP Address
     - availabilityZone - Return Cloud Vendor Availability Zone
     - instanceType - Return Cloud Vendor Instance Type
-    - engMode - Enable Alces Engineering Mode for 1 hour
     - userCreate - Create a user - requires '{"user-name":"<System username>","full-name":"<User's full name>"}'
     - userSetKey - Set SSH key for a system user - requires '{"user-name":"<System username>","key":"<SSH Key to be used>"}'
     - userGetList - Return list of system users.
     - userSetPasswd - Set the user's password - requires '{"user-name":"<System username>","passwd":"<User's password>"}'
     - userDelete - Delete a user from the system - requires '{"user-name":"<System username>","delete":true}'
+    - supportStatus - Return the status of the Alces Support VPN.
+    - supportEnabledSince - Return how long the Alces Support VPN has been connected.
+    - supportEnable - Enable the Alces Support VPN.
+    - supportDisable - Disable the Alces Support VPN.
+    - supportPing - Check connectivity to the Alces Support hub.
     - shutdown - Shut down the instance - requires '{"shutdown":true}'
     - reboot - Restart the instance - requires '{"reboot":true}' 
 
@@ -247,8 +287,6 @@ begin
     response = apiAvailZone()
   when 'instanceType'
     response = apiInstanceType()
-  when 'engMode'
-    response = apiEngMode()
   when 'userCreate'
     response = apiCreateUser(ARGV[1])
   when 'userSetKey'
@@ -259,6 +297,16 @@ begin
     response = apiUserSetPasswd(ARGV[1])
   when 'userDelete'
     response = apiUserDelete(ARGV[1])
+  when 'supportStatus'
+    response = apiSupportStatus()
+  when 'supportEnabledSince'
+    response = apiSupportEnabledSince()
+  when 'supportEnable'
+    response = apiSupportEnable()
+  when 'supportDisable'
+    response = apiSupportDisable()
+  when 'supportPing'
+    response = apiSupportPing()
   when 'shutdown'
     response = apiShutdown(ARGV[1])
   when 'reboot'
