@@ -38,6 +38,7 @@ end
 def extDNS
   begin
     dnsName = "https://#{$config['appliance_name']}.appliance.alces.network"
+    return dnsName
   rescue
     quietError("extDNS()", "Could not get SSL name")
     return false
