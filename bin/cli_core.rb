@@ -39,7 +39,6 @@ def mainmenu()
   sel = $prompt.select('What would you like to do?') do |menu|
     menu.choice 'View System Information', 'info'
     menu.choice 'User Management', 'uman'
-    menu.choice "Flight Management Console", 'flsh'
     menu.choice 'Alces Remote Assistance', 'support'
     menu.choice 'Launch console', 'console'
     menu.choice 'Exit menu', 'getout'
@@ -61,8 +60,6 @@ def main()
       infomenu()
     when 'uman'
       usermanager()
-    when 'flsh'
-      flsh()      
     when 'support'
       support_cli()
     when 'shutdown'

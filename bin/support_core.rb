@@ -31,15 +31,23 @@ def getSupportStatus()
 end
 
 def getSupportEnabledSince()
-  return `systemctl status openvpn@alces-support | grep "Active" | cut -f2 -d';'`.strip
+  if getSupportStatus()
+    return `systemctl status openvpn@alces-support | grep "Active" | cut -f2 -d';'`.strip
+  else
+    return "Support Disabled"
+  end
 end
 
 def enableRemoteSupport()
   `sudo systemctl start openvpn@alces-support`
+  sleep 5
+  return pingRemoteSupport()
 end
 
 def disableRemoteSupport()
   `sudo systemctl stop openvpn@alces-support`
+  sleep 5
+   return !getSupportStatus()
 end
 
 def pingRemoteSupport()

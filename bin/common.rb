@@ -46,10 +46,6 @@ def loginsh
   shell('/bin/bash -l')
 end
 
-def flsh
-  shell('/opt/flight/bin/flight shell')
-end
-
 def shell(cmd)
   pid = spawn(cmd)
   begin
