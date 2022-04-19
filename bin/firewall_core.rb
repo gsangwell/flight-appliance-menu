@@ -26,57 +26,34 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-#trap('INT') { puts "Quitting..."; exit }
+def getFirewallZones()
+  output = `/bin/firewall-cmd --get-active`
+  zones = []
 
-ascprint = Artii::Base.new :font => 'slant'
-welcome = ascprint.asciify('Alces Hub')
-puts welcome
-
-
-$prompt = TTY::Prompt.new
-
-def mainmenu()
-  sel = $prompt.select('What would you like to do?') do |menu|
-    menu.choice 'View System Information', 'info'
-    menu.choice 'User Management', 'uman'
-    menu.choice 'Network Management', 'network'
-    menu.choice 'Power Management', 'power'
-    menu.choice 'Firewall Management', 'firewall'
-    menu.choice 'Alces Remote Assistance', 'support'
-    menu.choice 'Launch console', 'console'
-    menu.choice 'Exit menu', 'getout'
-   end
-  return sel
-end
-
-def getout()
-  exit
-end
-
-def main()
-  loop do
-    puts "\n"
-    case mainmenu()
-    when 'info'
-      infomenu()
-    when 'uman'
-      usermanager()
-    when 'network'
-      network_cli()
-    when 'power'
-      power_cli()
-    when 'firewall'
-      firewall_cli()
-    when 'support'
-      support_cli()
-    when 'getout'
-      getout()
-    when 'client'
-      client()
-    when 'console'
-      loginsh
-    else
-      puts 'invalid'
-    end
+  output.each_line.with_index do |line,i|
+    next if line.match(/^ /)
+    zones << line.chomp
   end
+
+  return zones
+end
+
+def getFirewallZoneDetails(name)
+
+  zone = {}
+  zone['name'] = name
+  zone['interfaces'] = `/bin/sudo /usr/bin/firewall-cmd --list-interfaces --zone #{name}`.split
+  zone['masquerade'] = `/bin/sudo /usr/bin/firewall-cmd --query-masquerade --zone #{name}` 
+  zone['services'] = `/bin/sudo /usr/bin/firewall-cmd --list-services --zone #{name}`.split
+  zone['ports'] = `/bin/sudo /usr/bin/firewall-cmd --list-ports --zone #{name}`.split
+  return zone
+end
+
+def getAllFirewallZoneDetails()
+  zones = []
+  getFirewallZones().each do |name|
+    zone = getFirewallZoneDetails(name)
+    zones << zone
+  end
+  return zones
 end

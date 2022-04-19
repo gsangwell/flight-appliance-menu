@@ -26,34 +26,34 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-def network_cli()
+def firewall_cli()
   sel = $prompt.select('Choose an option') do |menu|
-    menu.choice 'List Interfaces', 'list'
-    menu.choice 'Show Interface', 'show'
+    menu.choice 'List Zones', 'list'
+    menu.choice 'Show Zone', 'show'
     menu.choice 'Return', 'ret'
   end
   case sel
   when 'list'
-    puts networkInterfaces()
+    puts listFirewallZones()
   when 'show'
-    showInterfaceMenu()
+    showZoneMenu()
   when 'ret'
     main()
   end
 end
 
-def networkInterfaces()
+def listFirewallZones()
   table = []
-  getNetworkInterfaces().each do |interface|
-    table << ["#{interface}"]
+  getFirewallZones().each do |zone|
+    table << ["#{zone}"]
   end
-  puts outputTable("Network Interfaces", table)
+  puts outputTable("Firewall Zones", table)
 end
 
-def showInterfaceMenu()
+def showZoneMenu()
   sel = $prompt.select('Choose an option') do |menu|
-    getNetworkInterfaces().each do |interface|
-      menu.choice "#{interface}", "#{interface}"
+    getFirewallZones().each do |zone|
+      menu.choice "#{zone}", "#{zone}"
     end
     menu.choice 'Return', 'ret'
   end
@@ -62,60 +62,19 @@ def showInterfaceMenu()
   when 'ret'
     network_cli()
   else
-    showInterface(sel)
+    showZone(sel)
   end  
 end
 
-def showInterface(name)
-  interface = getInterfaceDetails(name)
+def showZone(name)
+  zone = getFirewallZoneDetails(name)
 
   table = []
-  table << ['Name:', interface['name']]
-  table << ['Status:', interface['status']]
-  table << ['Hardware Address:', interface['mac']]
-  table << ['IPV4 Addresses:', interface['ipv4'].join(", ")]
+  table << ['Name:', zone['name']]
+  table << ['Interfaces:', zone['interfaces'].join(", ")]
+  table << ['Services:', zone['services'].empty? ? "None " : zone['services'].join(", ")]
+  table << ['Ports:', zone['ports'].empty? ? "None " : zone['ports'].join(", ")]
+  table << ['Masquerade:', zone['masquerade']]
 
   puts outputTable("Interface Details", table)
-end
-
-def editMenu()
-  sel = $prompt.select('Choose an option') do |menu|
-    getNetworkInterfaces().each do |interface|
-      menu.choice "#{interface}", "#{interface}"
-    end
-    menu.choice 'Return', 'ret'
-  end
-
-  case sel
-  when 'ret'
-    network_cli()
-  else
-    editInterface(sel)
-  end  
-end
-
-def editInterface(interface)
-  interface = getInterfaceDetails(interface)
-
-  sel = $prompt.select('Choose an option') do |menu|
-    menu.choice 'Disable', 'disable' if interface['status'] == "up"
-    menu.choice 'Enable', 'enable' if interface['status'] != "up"
-    menu.choice 'Return', 'ret'
-  end
-  case sel
-  when 'disable'
-    disableInterface(interface)
-  when 'enable'
-    enableInterface(interface)
-  when 'ret'
-    editMenu()
-  end
-end
-
-def disableInterface(interface)
-  puts "Disabled #{interface}"
-end
-
-def enableInterface(interface)
-  puts "Enabled #{interface}"
 end

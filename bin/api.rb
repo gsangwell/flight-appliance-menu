@@ -270,6 +270,31 @@ def apiNetworkAllInterfaceDetails()
   return {'interfaces' => getAllInterfaceDetails()}
 end
 
+def apiFirewallZoneList()
+  return {'zones' => getFirewallZones()}
+end
+
+def apiFirewallZoneDetails(name)
+  begin
+    hash = JSON.parse(inputJson)
+  rescue
+    return {'status' => false}
+  end
+  if ! hash['zone'].nil?
+    begin
+      return {'zone' => getFirewallZoneDetails(hash['zone'])}
+    rescue
+      return {'zone' => hash['zone'], 'invalid' => true}
+    end
+  else
+    return {'status' => false}
+  end
+end
+
+def apiFirewallAllZoneDetails()
+  return {'zones' => getAllFirewallZoneDetails()}
+end
+
 def apiHelp()
   <<~HEREDOC
 
@@ -341,6 +366,12 @@ begin
     response = apiNetworkInterfaceDetails(ARGV[1])
   when 'networkAllInterfaceDetails'
     response = apiNetworkAllInterfaceDetails()
+  when 'firewallZoneList'
+    response = apiFirewallZoneList()
+  when 'firewallZoneDetails'
+    response = apiFirewallZoneDetails(ARGV[1])
+  when 'firewallAllZoneDetails'
+    response = apiFirewallAllZoneDetails()
   when 'shutdown'
     response = apiShutdown(ARGV[1])
   when 'reboot'
