@@ -65,6 +65,8 @@ def setup()
   elsif ! $INVOKE_SRC.include? 'api'
     #Any requires for API Functionality.
   end
+
+  $config = YAML.load(File.read(File.expand_path('../../cfg/config.yaml',__FILE__)))
   
   bios = `sudo /usr/sbin/dmidecode -s bios-version | /bin/tr "[:upper:]" "[:lower:]" | /bin/grep "amazon"`
   azure = `sudo /usr/sbin/dmidecode -s chassis-manufacturer`
