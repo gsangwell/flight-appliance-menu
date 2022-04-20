@@ -2,9 +2,14 @@
 
 FLIGHT_APPLIANCE_MENU_BRANCH=dev/fixes
 
+######## Ask for config ##########
+echo -n "Enter your appliance name: "; read APPL_NAME
+echo -n "Enter your Alces Support Username: "; read VPN_USERNAME
+echo -n "Enter your Alces Support Password: "; read VPN_PASSWORD
+
 ######## Base Packages ###########
 yum -y install patch autoconf automake bison bzip2 gcc-c++ libffi-devel libtool \
-patch readline-devel ruby sqlite-devel zlib-devel glibc-headers glibc-devel openssl-devel make unzip wget git
+patch readline-devel ruby sqlite-devel zlib-devel glibc-headers glibc-devel openssl-devel make unzip wget git uuid
 yum -y install epel-release
 yum -y install openvpn easy-rsa bind-utils
 
@@ -101,9 +106,7 @@ comp-lzo
 verb 3
 EOF
 
-# Ask for Alces support username and password
-echo -n "Enter your Alces Support Username: "; read VPN_USERNAME
-echo -n "Enter your Alces Support Password: "; read VPN_PASSWORD
+# Configure VPN
 cat << EOF > /etc/openvpn/auth.alces-support
 ${VPN_USERNAME}
 ${VPN_PASSWORD}
@@ -148,10 +151,24 @@ chmod 775 /var/log/alces
 chmod 664 /var/log/alces/flightappmenu
 
 ######## Configure menu system ##############
-appliance_name = "appliance-$(uuid -v4 | cut -f1 -d'-')"
-host_name = "${appliance_name}.appliance.alces.network"
-
-sed -i "s/appliance_name:/appliance_name: ${appliance_name}/g" /opt/appliance/cfg/config.yaml
+sed -i "s/appliance_name:/appliance_name: ${APPL_NAME}/g" /opt/appliance/cfg/config.yaml
 
 ######## Set hostname ##############
-hostnamectl set-hostname "$hostname"
+host_name="${APPL_NAME}.appliance.alces.network"
+hostnamectl set-hostname "$host_name"
+
+######## Spash screen ##############
+cat << EOF > /etc/default/grub
+GRUB_DISTRIBUTOR="$(sed 's, release .*$,,g' /etc/system-release)"
+GRUB_DEFAULT=saved
+GRUB_DISABLE_SUBMENU=true
+GRUB_DISABLE_RECOVERY="true"
+GRUB_BACKGROUND="/boot/grub2/alces.png"
+GRUB_TIMEOUT=0
+GRUB_CMDLINE_LINUX="console=ttyS0"
+GRUB_CMDLINE_LINUX_DEFAULT="splash quiet"
+GRUB_TERMINAL_OUTPUT="gfxterm"
+EOF
+
+cp /opt/appliance/support/build/alces.png /boot/grub2/alces.png 
+grub2-mkconfig -o /boot/grub2/grub.cfg
