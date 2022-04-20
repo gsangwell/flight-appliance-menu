@@ -43,7 +43,7 @@ $logger_stderr = Logger.new(STDERR)
 #end
 
 def loginsh
-  shell('/bin/bash -l')
+  exec('/bin/bash -l')
 end
 
 def shell(cmd)
