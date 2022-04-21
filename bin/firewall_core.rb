@@ -27,15 +27,16 @@
 #==============================================================================
 
 def getFirewallZones()
-  output = `/bin/firewall-cmd --get-active`
-  zones = []
+  #output = `/bin/firewall-cmd --get-active`
+  #zones = []
 
-  output.each_line.with_index do |line,i|
-    next if line.match(/^ /)
-    zones << line.chomp
-  end
+  #output.each_line.with_index do |line,i|
+  #  next if line.match(/^ /)
+  #  zones << line.chomp
+  #end
 
-  return zones
+  #return zones
+  return $config['firewall']['zones']
 end
 
 def getFirewallZoneDetails(name)

@@ -27,18 +27,19 @@
 #==============================================================================
 
 def getNetworkInterfaces()
-  output = `/sbin/ip addr`
-  interfaces = []
+  #output = `/sbin/ip addr`
+  #interfaces = []
 
-  output.each_line.with_index do |line,i|
-    if line.match(/^[0-9]+:/)
-      name = line.match(/^[0-9]+: ([a-zA-Z0-9]*):/)[1]
-      next if ['lo', 'tun0'].include?(name)
-      interfaces << name
-    end
-  end
+  #output.each_line.with_index do |line,i|
+  #  if line.match(/^[0-9]+:/)
+  #    name = line.match(/^[0-9]+: ([a-zA-Z0-9]*):/)[1]
+  #    next if ['lo', 'tun0'].include?(name)
+  #    interfaces << name
+  #  end
+  #end
 
-  return interfaces
+  #return interfaces
+  return $config['network']['interfaces']
 end
 
 def getInterfaceDetails(name)
