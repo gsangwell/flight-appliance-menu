@@ -50,12 +50,12 @@ EOF
 
 ############ Alces operator - default user account ############
 useradd alces-operator -G operators
-usermod alces-operator --shell /opt/appliance/bin/cli.rb
+usermod alces-operator --shell /opt/appliance/bin/flightusershell.rb
 usermod -L alces-operator
 
 ############ Operator sudo rule to allow system commands ############
 cat << EOF > /etc/sudoers.d/10-alces-appliance
-Cmnd_Alias OPS = /sbin/usermod engineer --shell /bin/bash,/sbin/dmidecode,/sbin/usermod engineer --shell /sbin/nologin,/sbin/useradd,/sbin/lid,/sbin/shutdown,/bin/passwd,/bin/systemctl start openvpn@alces-support,/bin/systemctl stop openvpn@alces-support
+Cmnd_Alias OPS = /sbin/usermod engineer --shell /bin/bash,/sbin/dmidecode,/sbin/usermod engineer --shell /sbin/nologin,/sbin/useradd,/sbin/lid,/sbin/shutdown,/bin/passwd,/bin/systemctl start openvpn@alces-support,/bin/systemctl stop openvpn@alces-support,/usr/bin/firewall-cmd --list-interfaces *,/usr/bin/firewall-cmd --query-masquerade *,/usr/bin/firewall-cmd --list-services *,/usr/bin/firewall-cmd --list-ports *
 %operators      ALL = NOPASSWD: OPS
 EOF
 
