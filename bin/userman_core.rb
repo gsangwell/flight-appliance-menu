@@ -99,3 +99,17 @@ def deleteUserHandler(user)
     raise StandardError
   end
 end
+
+def setPasswd(user, password)
+  begin
+    status = Open3.capture3("echo '#{user}:#{password}' | \/sbin\/chpasswd -e")
+
+    if status[2].success?
+      appendLogFile("setPasswd(#{user}, #{password})", status.to_s)
+      return true
+    else
+      quietError("setPasswd(#{user}, #{password})", status.to_s)
+      return false
+    end
+  end
+end

@@ -131,7 +131,7 @@ def apiCreateUser(inputJson)
   else return {'status' => false}
   end  
   response = createUser(uname, fname)
-  if response[2].success?
+  if response
     return {'user-name' => uname, 'status' => true}
   else
     return {'user-name' => uname, 'status' => false, 'stdout' => response[0], 'stderr' => response[1]}
