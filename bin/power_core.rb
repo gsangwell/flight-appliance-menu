@@ -28,8 +28,8 @@
 
 def shutdown()
   appendLogFile('shutdown()','Shutdown requested')
-  rbt = Open3.capture3('sudo shutdown -h 1')
-  if rbt[2].success?
+  sht = Open3.capture3('sudo shutdown -h 1')
+  if sht[2].success?
     appendLogFile('shutdown()',"status #{sht}")
   else
     outputError('shutdown()', "Failed with response #{sht.to_s}")

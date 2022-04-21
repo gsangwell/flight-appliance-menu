@@ -13,6 +13,9 @@ echo "$VPN_PASSWORD" | sed 's/./*/g'
 sudo sed -i "s/appliance_name:/appliance_name: ${APPL_NAME}/g" /opt/appliance/cfg/config.yaml
 host_name="${APPL_NAME}.appliance.alces.network"
 sudo hostnamectl set-hostname "$host_name"
+sudo bash -c 'cat >> /etc/hosts' << EOF
+127.0.0.1     ${APPL_NAME}
+EOF
 
 # Configure vpn
 sudo bash -c 'cat > /etc/openvpn/client/auth.alces-support' << EOF
@@ -35,13 +38,15 @@ fi
 # Turn off support VPN
 sudo systemctl stop openvpn-client@alces-support
 
-# Start services
-sudo systemctl enable flight-terminal
-sudo systemctl enable appliance-gui
-sudo systemctl enable nginx
-sudo systemctl start flight-terminal
-sudo systemctl start appliance-gui
-sudo systemctl start nginx
+# Start GUI services if installed
+if [ -f  "/opt/appliance-gui/.env" ] ; then
+    sudo systemctl enable flight-terminal
+    sudo systemctl enable appliance-gui
+    sudo systemctl enable nginx
+    sudo systemctl start flight-terminal
+    sudo systemctl start appliance-gui
+    sudo systemctl start nginx
+fi
 
 echo -e "Appliance setup complete!"
 
