@@ -27,25 +27,25 @@
 #==============================================================================
 
 def getSupportStatus()
- return `systemctl status openvpn@alces-support | grep Active | awk '{print $2}'`.strip == "active"
+ return `systemctl status openvpn-client@alces-support | grep Active | awk '{print $2}'`.strip == "active"
 end
 
 def getSupportEnabledSince()
   if getSupportStatus()
-    return `systemctl status openvpn@alces-support | grep "Active" | cut -f2 -d';'`.strip
+    return `systemctl status openvpn-client@alces-support | grep "Active" | cut -f2 -d';'`.strip
   else
     return "Support Disabled"
   end
 end
 
 def enableRemoteSupport()
-  `sudo systemctl start openvpn@alces-support`
+  `sudo systemctl start openvpn-client@alces-support`
   sleep 5
   return pingRemoteSupport()
 end
 
 def disableRemoteSupport()
-  `sudo systemctl stop openvpn@alces-support`
+  `sudo systemctl stop openvpn-client@alces-support`
   sleep 5
    return !getSupportStatus()
 end

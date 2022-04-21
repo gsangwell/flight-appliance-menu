@@ -19,11 +19,11 @@ sudo bash -c 'cat > /etc/openvpn/auth.alces-support' << EOF
 ${VPN_USERNAME}
 ${VPN_PASSWORD}
 EOF
-sudo chmod 600 /etc/openvpn/auth.alces-support
+sudo chmod 600 /etc/openvpn/client/auth.alces-support
 
 # Test vpn
 echo -n "Testing support VPN.. "
-sudo systemctl start openvpn@alces-support
+sudo systemctl start openvpn-client@alces-support
 sleep 15
 
 if  ping -c 1 10.178.0.1 > /dev/null ; then
@@ -33,7 +33,7 @@ else
 fi
 
 # Turn off support VPN
-sudo systemctl stop openvpn@alces-support
+sudo systemctl stop openvpn-client@alces-support
 
 # Start services
 sudo systemctl enable flight-terminal

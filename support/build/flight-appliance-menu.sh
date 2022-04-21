@@ -57,12 +57,12 @@ EOF
 
 ############ Operator sudo rule to allow system commands ############
 cat << EOF > /etc/sudoers.d/10-alces-appliance
-Cmnd_Alias OPS = /sbin/usermod engineer --shell /bin/bash,/sbin/dmidecode,/sbin/usermod engineer --shell /sbin/nologin,/sbin/useradd,/sbin/lid,/sbin/shutdown,/bin/passwd,/bin/systemctl start openvpn@alces-support,/bin/systemctl stop openvpn@alces-support,/usr/bin/firewall-cmd --list-interfaces *,/usr/bin/firewall-cmd --query-masquerade *,/usr/bin/firewall-cmd --list-services *,/usr/bin/firewall-cmd --list-ports *
+Cmnd_Alias OPS = /sbin/usermod engineer --shell /bin/bash,/sbin/dmidecode,/sbin/usermod engineer --shell /sbin/nologin,/sbin/useradd,/sbin/lid,/sbin/shutdown,/bin/passwd,/bin/systemctl start openvpn-client@alces-support,/bin/systemctl stop openvpn-client@alces-support,/usr/bin/firewall-cmd --list-interfaces *,/usr/bin/firewall-cmd --query-masquerade *,/usr/bin/firewall-cmd --list-services *,/usr/bin/firewall-cmd --list-ports *
 %operators      ALL = NOPASSWD: OPS
 EOF
 
 ######## OpenVPN setup for Alces support ######
-cat << EOF > /etc/openvpn/alces-support.conf
+cat << EOF > /etc/openvpn/client/alces-support.conf
 client
 dev tun0
 proto tcp
