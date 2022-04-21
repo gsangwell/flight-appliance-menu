@@ -50,8 +50,6 @@ WantedBy=multi-user.target
 EOF
 
 chmod 644 /usr/lib/systemd/system/flight-terminal.service
-systemctl enable flight-terminal.service
-systemctl restart flight-terminal
 
 ########### Appliance GUI ##################
 
@@ -63,7 +61,7 @@ touch /opt/appliance/cluster.md
 
 # Configure
 sed -i "s/APPLIANCE_INFORMATION_FILE_PATH=examples\/appliance_information_example/APPLIANCE_INFORMATION_FILE_PATH=\/opt\/appliance-gui\/cluster.md/g" .env
-sed -i "s/^#SECRET_KEY_BASE=.*/SECRET_KEY_BASE=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 25)/g"
+sed -i "s/^#SECRET_KEY_BASE=.*/SECRET_KEY_BASE=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 25)/g" .env
 sed -i "s/^#RAILS_SERVE_STATIC_FILES/RAILS_SERVE_STATIC_FILES/g" .env
 
 bundle install
@@ -85,7 +83,6 @@ WantedBy=multi-user.target
 EOF
 
 chmod 644 /usr/lib/systemd/system/appliance-gui.service
-systemctl enable appliance-gui.service
 
 postgresql-setup initdb
 sed -i 's/peer$/trust/g;s/ident$/trust/g' /var/lib/pgsql/data/pg_hba.conf
@@ -97,8 +94,6 @@ RAILS_ENV=production bin/rails db:schema:load
 RAILS_ENV=production bin/rails data:migrate
 echo "bolt_on = BoltOn.find_by(name: 'Console') ; bolt_on.enabled = true ; bolt_on.save! " |RAILS_ENV=production bin/rails console
 rake assets:precompile
-
-systemctl restart appliance-gui
 
 ########### Nginx ##################
 yum -y install nginx
@@ -189,5 +184,3 @@ EOF
 cat << 'EOF' > /etc/nginx/server-http.d/redirect-http-to-https.conf
 return 307 https://$host$request_uri;
 EOF
-
-systemctl enable nginx

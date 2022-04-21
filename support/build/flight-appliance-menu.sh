@@ -2,11 +2,6 @@
 
 FLIGHT_APPLIANCE_MENU_BRANCH=dev/fixes
 
-######## Ask for config ##########
-echo -n "Enter your appliance name: "; read APPL_NAME
-echo -n "Enter your Alces Support Username: "; read VPN_USERNAME
-echo -n "Enter your Alces Support Password: "; read VPN_PASSWORD
-
 ######## Base Packages ###########
 yum -y install patch autoconf automake bison bzip2 gcc-c++ libffi-devel libtool \
 patch readline-devel ruby sqlite-devel zlib-devel glibc-headers glibc-devel openssl-devel make unzip wget git uuid
@@ -52,6 +47,13 @@ EOF
 useradd alces-operator -G operators
 usermod alces-operator --shell /opt/appliance/bin/flightusershell.rb
 usermod -L alces-operator
+
+############ Default operator account - for first run setup #############
+useradd operator1 -G operators
+usermod operator1 --shell /opt/appliance/support/build/first-setup.sh
+cat << EOF > /etc/sudoers.d/operator1
+operator1    ALL=(ALL)       NOPASSWD: ALL
+EOF
 
 ############ Operator sudo rule to allow system commands ############
 cat << EOF > /etc/sudoers.d/10-alces-appliance
@@ -106,26 +108,6 @@ comp-lzo
 verb 3
 EOF
 
-# Configure VPN
-cat << EOF > /etc/openvpn/auth.alces-support
-${VPN_USERNAME}
-${VPN_PASSWORD}
-EOF
-chmod 600 /etc/openvpn/auth.alces-support
-
-# Test VPN
-systemctl start openvpn@alces-support
-sleep 15
-
-if  ping -c 1 10.178.0.1 ; then
-    echo "Alces Support VPN setup complete!"
-else
-    echo "Alces Support VPN setup incomplete!"
-fi
-
-# Turn off support VPN
-systemctl stop openvpn@alces-support
-
 ######## Firewall ##############
 yum install -y firewalld
 systemctl enable firewalld
@@ -149,13 +131,6 @@ chown root:operators /var/log/alces
 chown root:operators /var/log/alces/flightappmenu
 chmod 775 /var/log/alces
 chmod 664 /var/log/alces/flightappmenu
-
-######## Configure menu system ##############
-sed -i "s/appliance_name:/appliance_name: ${APPL_NAME}/g" /opt/appliance/cfg/config.yaml
-
-######## Set hostname ##############
-host_name="${APPL_NAME}.appliance.alces.network"
-hostnamectl set-hostname "$host_name"
 
 ######## Spash screen ##############
 cat << EOF > /etc/default/grub
