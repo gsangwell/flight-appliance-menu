@@ -15,7 +15,7 @@ host_name="${APPL_NAME}.appliance.alces.network"
 sudo hostnamectl set-hostname "$host_name"
 
 # Configure vpn
-sudo bash -c 'cat > /etc/openvpn/auth.alces-support' << EOF
+sudo bash -c 'cat > /etc/openvpn/client/auth.alces-support' << EOF
 ${VPN_USERNAME}
 ${VPN_PASSWORD}
 EOF
@@ -45,8 +45,8 @@ sudo systemctl start nginx
 
 echo -e "Appliance setup complete!"
 
-# Remove additional sudo rule
-sudo rm -rf /etc/sudoers.d/operator1
-
 # Switch shell back
 sudo usermod operator1 --shell /opt/appliance/bin/flightusershell.rb
+
+# Remove additional sudo rule
+sudo rm -rf /etc/sudoers.d/operator1
