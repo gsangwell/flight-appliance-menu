@@ -28,15 +28,18 @@
 
 def network_cli()
   sel = $prompt.select('Choose an option') do |menu|
-    menu.choice 'List Interfaces', 'list'
-    menu.choice 'Show Interface', 'show'
+    menu.choice 'List Networks', 'list'
+    menu.choice 'Show Network', 'show'
+    menu.choice 'Configure Network', 'config'
     menu.choice 'Return', 'ret'
   end
   case sel
   when 'list'
     puts networkInterfaces()
   when 'show'
-    showInterfaceMenu()
+    networkSelectMenu(:showNetwork)
+  when 'config'
+    networkSelectMenu(:configureNetwork)
   when 'ret'
     main()
   end
@@ -50,7 +53,7 @@ def networkInterfaces()
   puts outputTable("Network Interfaces", table)
 end
 
-def showInterfaceMenu()
+def networkSelectMenu(callback)
   sel = $prompt.select('Choose an option') do |menu|
     getNetworkInterfaces().each do |interface|
       menu.choice "#{interface}", "#{interface}"
@@ -62,19 +65,20 @@ def showInterfaceMenu()
   when 'ret'
     network_cli()
   else
-    showInterface(sel)
-  end  
+    method(callback.to_sym).call(sel)
+  end
 end
 
-def showInterface(name)
+def showNetwork(name)
   interface = getInterfaceDetails(name)
 
   table = []
   table << ['Name:', interface['name']]
+  table << ['Interface:', interface['interface']]
   table << ['Status:', interface['status']]
   table << ['Hardware Address:', interface['mac']]
   table << ['IPV4 Addresses:', interface['ipv4'].join(", ")]
-
+  table << ['Firewall Zone:', interface['firewall_zone']]
   puts outputTable("Interface Details", table)
 end
 
@@ -94,28 +98,56 @@ def editMenu()
   end  
 end
 
-def editInterface(interface)
-  interface = getInterfaceDetails(interface)
+def configureNetwork(network)
+  table = []
+  table << ['Network:', network]
 
-  sel = $prompt.select('Choose an option') do |menu|
-    menu.choice 'Disable', 'disable' if interface['status'] == "up"
-    menu.choice 'Enable', 'enable' if interface['status'] != "up"
-    menu.choice 'Return', 'ret'
+  config = {}
+
+  static = $prompt.select("Configure network #{network}: ", ['static', 'DHCP'])
+
+  if static == "static"
+    config['static'] = true
+
+    config['ipv4'] = $prompt.ask("IPV4 Address:", required: true) do |q|
+      q.validate(/^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$/, "Invalid IPV4 Address")
+    end
+
+    config['netmask'] = $prompt.ask("Netmask:", required: true) do |q|
+      q.validate(/^((128|192|224|240|248|252|254)\.0\.0\.0)|(255\.(((0|128|192|224|240|248|252|254)\.0\.0)|(255\.(((0|128|192|224|240|248|252|254)\.0)|255\.(0|128|192|224|240|248|252|254)))))$/, "Invalid Netmask")
+    end
+
+    yn = $prompt.yes?("Set a default gateway?") do |q|
+      q.default false
+    end
+
+    if yn
+      config['gateway'] = $prompt.ask("Default Gateway:", required: true) do |q|
+        q.validate(/^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$/, "Invalid Gateway")
+      end
+    else
+      config['gateway'] = nil
+    end
+
+    table << ['DHCP:', "static"]
+    table << ['IPV4:', config['ipv4']]
+    table << ['Netmask:', config['netmask']]
+    table << ['Default Gateway:', config['gateway'] == nil ? 'None' : config['gateway']]
+  else
+    config['static'] = false
+    table << ['DHCP:', "auto"]
   end
-  case sel
-  when 'disable'
-    disableInterface(interface)
-  when 'enable'
-    enableInterface(interface)
-  when 'ret'
-    editMenu()
+
+  puts outputTable("New Network Settings", table)
+
+  yn = $prompt.yes?("Are you sure you wish to reconfigure this network?") do |q|
+    q.default false
   end
-end
 
-def disableInterface(interface)
-  puts "Disabled #{interface}"
-end
-
-def enableInterface(interface)
-  puts "Enabled #{interface}"
+  if yn
+    configureInterface(network, config)
+    puts "Reconfigured #{network} - please restart the appliance."
+  else
+    puts "Cancelled."
+  end  
 end

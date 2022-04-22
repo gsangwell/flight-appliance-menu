@@ -36,6 +36,7 @@ def getFirewallZones()
   #end
 
   #return zones
+  
   return $config['firewall']['zones']
 end
 

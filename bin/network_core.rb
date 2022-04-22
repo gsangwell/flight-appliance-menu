@@ -39,14 +39,25 @@ def getNetworkInterfaces()
   #end
 
   #return interfaces
-  return $config['network']['interfaces']
+
+  interfaces = []
+
+  $config['networks'].each do |network, config|
+    interfaces << network
+  end
+
+  return interfaces
 end
 
 def getInterfaceDetails(name)
-  output = `/sbin/ip addr show dev #{name}`
+
+  int = $config['networks'][name]['interface']
+
+  output = `/sbin/ip addr show dev #{int}`
 
   interface = {}
   interface['name'] = name
+  interface['interface'] = int
   interface['ipv4'] = []
 
   output.each_line do |line|
@@ -55,9 +66,9 @@ def getInterfaceDetails(name)
     end
   end
 
-  interface['status'] = `cat /sys/class/net/eth0/subsystem/#{name}/operstate`.chomp
-  interface['mac'] = `cat /sys/class/net/eth0/subsystem/#{name}/address`.chomp
-  interface['firewall_zone'] = `firewall-cmd --get-zone-of-interface #{name}`.chomp
+  interface['status'] = `cat /sys/class/net/eth0/subsystem/#{int}/operstate`.chomp
+  interface['mac'] = `cat /sys/class/net/eth0/subsystem/#{int}/address`.chomp
+  interface['firewall_zone'] = `firewall-cmd --get-zone-of-interface #{int} 2>&1`.chomp
 
 
   return interface
@@ -70,4 +81,37 @@ def getAllInterfaceDetails()
     interfaces << interface
   end
   return interfaces
+end
+
+def configureInterface(name, settings)
+  int = $config['networks'][name]['interface']
+
+  if settings['static']
+  `cat << EOF | sudo /bin/tee /etc/sysconfig/network-scripts/ifcfg-#{int} > /dev/null
+BOOTPROTO=none
+DEVICE=#{int}
+ONBOOT=yes
+IPADDR=#{settings['ipv4']}
+NETMASK=#{settings['netmask']}
+EOF
+`
+  # Default gw?
+  if settings['gateway'] != nil
+    `cat << EOF | sudo /bin/tee -a /etc/sysconfig/network-scripts/ifcfg-#{int} > /dev/null
+GATEWAY=#{settings['gateway']}
+EOF
+`
+  end
+
+  # DHCP config
+  else
+  `cat << EOF | sudo /bin/tee /etc/sysconfig/network-scripts/ifcfg-#{int} > /dev/null
+BOOTPROTO=dhcp
+DEVICE=#{int}
+ONBOOT=yes
+EOF
+`
+  end
+
+  return true
 end

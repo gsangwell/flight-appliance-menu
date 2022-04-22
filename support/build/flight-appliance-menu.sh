@@ -48,13 +48,6 @@ useradd alces-operator -G operators
 usermod alces-operator --shell /opt/appliance/bin/flightusershell.rb
 usermod -L alces-operator
 
-############ Default operator account - for first run setup #############
-useradd operator1 -G operators
-usermod operator1 --shell /opt/appliance/support/build/first-setup.sh
-cat << EOF > /etc/sudoers.d/operator1
-operator1    ALL=(ALL)       NOPASSWD: ALL
-EOF
-
 ############ Operator sudo rule to allow system commands ############
 cat << EOF > /etc/sudoers.d/10-alces-appliance
 Cmnd_Alias OPS = /sbin/usermod engineer --shell /bin/bash,/sbin/dmidecode,/sbin/usermod engineer --shell /sbin/nologin,/sbin/useradd,/sbin/lid,/sbin/shutdown,/bin/passwd,/bin/systemctl start openvpn-client@alces-support,/bin/systemctl stop openvpn-client@alces-support,/usr/bin/firewall-cmd --list-interfaces *,/usr/bin/firewall-cmd --query-masquerade *,/usr/bin/firewall-cmd --list-services *,/usr/bin/firewall-cmd --list-ports *

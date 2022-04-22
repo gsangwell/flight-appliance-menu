@@ -274,7 +274,30 @@ def apiFirewallZoneList()
   return {'zones' => getFirewallZones()}
 end
 
-def apiFirewallZoneDetails(name)
+def apiNetworkReconfigure(inputJson)
+  begin
+    hash = JSON.parse(inputJson)
+  rescue
+    puts "invalid"
+    return {'status' => false}
+  end
+
+  if ! hash['network'].nil? and ! hash['settings'].nil?
+    begin
+      return {'network' => hash['network'], 'status' => configureInterface(hash['network'], hash['settings'])}
+    rescue
+      puts "fail"
+      return {'network' => hash['network'], 'status' => false}
+    end
+  else
+    puts "empty!"
+    return {'status' => false}
+  end
+
+  puts "done!"
+end
+
+def apiFirewallZoneDetails(inputJson)
   begin
     hash = JSON.parse(inputJson)
   rescue
@@ -366,6 +389,8 @@ begin
     response = apiNetworkInterfaceDetails(ARGV[1])
   when 'networkAllInterfaceDetails'
     response = apiNetworkAllInterfaceDetails()
+  when 'networkReconfigure'
+    response = apiNetworkReconfigure(ARGV[1])
   when 'firewallZoneList'
     response = apiFirewallZoneList()
   when 'firewallZoneDetails'

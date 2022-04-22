@@ -4,18 +4,14 @@ echo -e "\nAlces Hub - Setup:"
 echo -e "-------------------"
 
 # Config
-echo -n "Enter your appliance name: "; read APPL_NAME
-echo -n "Enter your Alces Support Username: "; read VPN_USERNAME
-echo -n "Enter your Alces Support Password: "; read -s VPN_PASSWORD
+echo -n "Enter appliance hostname: "; read APPL_NAME
+echo -n "Enter Alces Support Username: "; read VPN_USERNAME
+echo -n "Enter Alces Support Password: "; read -s VPN_PASSWORD
 echo "$VPN_PASSWORD" | sed 's/./*/g'
 
 # Configure appliance
 sudo sed -i "s/appliance_name:/appliance_name: ${APPL_NAME}/g" /opt/appliance/cfg/config.yaml
-host_name="${APPL_NAME}.appliance.alces.network"
-sudo hostnamectl set-hostname "$host_name"
-sudo bash -c 'cat >> /etc/hosts' << EOF
-127.0.0.1     ${APPL_NAME}
-EOF
+sudo hostnamectl set-hostname "$APPL_NAME"
 
 # Configure vpn
 sudo bash -c 'cat > /etc/openvpn/client/auth.alces-support' << EOF
@@ -49,9 +45,4 @@ if [ -f  "/opt/appliance-gui/.env" ] ; then
 fi
 
 echo -e "Appliance setup complete!"
-
-# Switch shell back
-sudo usermod operator1 --shell /opt/appliance/bin/flightusershell.rb
-
-# Remove additional sudo rule
-sudo rm -rf /etc/sudoers.d/operator1
+echo -e "Now configure /opt/appliance/cfg/config.yaml"
