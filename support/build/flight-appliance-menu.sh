@@ -29,7 +29,7 @@ groupadd engineers
 groupadd operators
 
 ########  Engineer user - for alces use ############
-useradd engineer -G engineers -G operators
+useradd engineer -G engineers
 usermod -L engineer
 usermod engineer --shell /sbin/nologin
 mkdir -p /home/engineer/.ssh
