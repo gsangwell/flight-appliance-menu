@@ -31,7 +31,6 @@ groupadd operators
 ########  Engineer user - for alces use ############
 useradd engineer -G engineers
 usermod -L engineer
-usermod engineer --shell /sbin/nologin
 mkdir -p /home/engineer/.ssh
 cat << EOF > /home/engineer/.ssh/authorized_keys
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDDj1OjrNkAv3Jroy7EggSv9dSEuzCKvS8l6oGN5b9OdIcL0kaIJzEk4P49M5zqPpQFlpjR+JYOsKBwnRVSx2ruu6CX3uYgb1O56H6MPvPNSJkt/XMGVs9PduiR/3s6cfKj3JsSFK/ECWLXL/AvR7anbdhAMsM4nFnYmveaI/giWlBPfldPgGoTQxH2Xc4DasuhOxC5RruWcMpr7WMWGzVeJbQepbUF2WO/JHFQ29lMBWJP+TDKIaPeYQp90kKQzp2VrOVUQptO+K5a1txiORzwFdaR/TmdL4dnlE42lf5OyRSnRTWKuvpI51B97cLZoczDe1jkHTJiYbjJFhfr+rjpe/rGrKooNH002lNcIolXe2rfgSZ08OiL1df8rFAZ4kCrxo7ycdsRqTHWHJu4ggWpKXzieqEtxaMgMl8yPYvRXkq6LLNyLbaB9yOcv2Q/qQ1TmzZ7L6z9BWwg18m5MbWqOYjlr7FA4apWvZpMaSPN80YTM1cdHI0npLrsleeTPAE= clusterclub
