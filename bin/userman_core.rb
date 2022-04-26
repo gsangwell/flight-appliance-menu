@@ -28,11 +28,12 @@
 
 def getUserList()
   begin
-    userlistraw = Open3.capture3("sudo lid -g operators")
+    userlistraw = Open3.capture3("sudo lid -g operators -n")
     if userlistraw[2].success?
-      userlist = userlistraw[0].split
-      userlist.each_with_index do |e,i|
-        userlist[i] = e.gsub(/\(.*\)/, '')
+      userlist = []
+      userlistraw[0].split.each do |u|
+        next if u == "alces-operator"
+        userlist << u
       end
       return userlist 
     else
