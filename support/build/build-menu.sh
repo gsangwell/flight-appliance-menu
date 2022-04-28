@@ -6,7 +6,11 @@ FLIGHT_APPLIANCE_MENU_BRANCH=dev/fixes
 yum -y install patch autoconf automake bison bzip2 gcc-c++ libffi-devel libtool \
 patch readline-devel ruby sqlite-devel zlib-devel glibc-headers glibc-devel openssl-devel make unzip wget git uuid
 yum -y install epel-release
-yum -y install openvpn easy-rsa bind-utils
+yum -y install openvpn easy-rsa bind-utils ansible python-netaddr
+
+######## Ansible collections ###########
+ansible-galaxy collection install community.crypto
+ansible-galaxy install linux-system-roles.network
 
 ######### Install RVM ##########
 if ! gpg2 --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB ; then
