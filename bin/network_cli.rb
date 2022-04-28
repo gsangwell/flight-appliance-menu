@@ -104,39 +104,29 @@ def configureNetwork(network)
 
   config = {}
 
-  static = $prompt.select("Configure network #{network}: ", ['static', 'DHCP'])
-
-  if static == "static"
-    config['static'] = true
-
-    config['ipv4'] = $prompt.ask("IPV4 Address:", required: true) do |q|
-      q.validate(/^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$/, "Invalid IPV4 Address")
-    end
-
-    config['netmask'] = $prompt.ask("Netmask:", required: true) do |q|
-      q.validate(/^((128|192|224|240|248|252|254)\.0\.0\.0)|(255\.(((0|128|192|224|240|248|252|254)\.0\.0)|(255\.(((0|128|192|224|240|248|252|254)\.0)|255\.(0|128|192|224|240|248|252|254)))))$/, "Invalid Netmask")
-    end
-
-    yn = $prompt.yes?("Set a default gateway?") do |q|
-      q.default false
-    end
-
-    if yn
-      config['gateway'] = $prompt.ask("Default Gateway:", required: true) do |q|
-        q.validate(/^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$/, "Invalid Gateway")
-      end
-    else
-      config['gateway'] = nil
-    end
-
-    table << ['DHCP:', "static"]
-    table << ['IPV4:', config['ipv4']]
-    table << ['Netmask:', config['netmask']]
-    table << ['Default Gateway:', config['gateway'] == nil ? 'None' : config['gateway']]
-  else
-    config['static'] = false
-    table << ['DHCP:', "auto"]
+  config['ipv4'] = $prompt.ask("IPV4 Address:", required: true) do |q|
+    q.validate(/^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$/, "Invalid IPV4 Address")
   end
+
+  config['netmask'] = $prompt.ask("Netmask:", required: true) do |q|
+    q.validate(/^((128|192|224|240|248|252|254)\.0\.0\.0)|(255\.(((0|128|192|224|240|248|252|254)\.0\.0)|(255\.(((0|128|192|224|240|248|252|254)\.0)|255\.(0|128|192|224|240|248|252|254)))))$/, "Invalid Netmask")
+  end
+
+  yn = $prompt.yes?("Set a default gateway?") do |q|
+    q.default false
+  end
+
+  if yn
+    config['gateway'] = $prompt.ask("Default Gateway:", required: true) do |q|
+      q.validate(/^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$/, "Invalid Gateway")
+    end
+  else
+    config['gateway'] = ""
+  end
+
+  table << ['IPV4:', config['ipv4']]
+  table << ['Netmask:', config['netmask']]
+  table << ['Default Gateway:', config['gateway'] == nil ? 'None' : config['gateway']]
 
   puts outputTable("New Network Settings", table)
 
@@ -145,9 +135,12 @@ def configureNetwork(network)
   end
 
   if yn
-    configureInterface(network, config)
-    puts "Reconfigured #{network} - please restart the appliance."
+    if configureInterface(network, config)
+      $prompt.ok("Reconfigured #{network} - please restart the appliance.")
+    else
+      $prompt.error("Error reconfiguring #{network} network.")
+    end
   else
-    puts "Cancelled."
+    $prompt.warn("Cancelled.")
   end  
 end

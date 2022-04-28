@@ -27,21 +27,18 @@
 #==============================================================================
 
 def shutdown()
-  appendLogFile('shutdown()','Shutdown requested')
-  sht = Open3.capture3('sudo shutdown -h 1')
-  if sht[2].success?
-    appendLogFile('shutdown()',"status #{sht}")
+
+  if runPlaybook("shutdown.yaml", {"user":"demo"})
+    $prompt.ok("Shutdown requested.")
   else
-    outputError('shutdown()', "Failed with response #{sht.to_s}")
+    $prompt.error("Error requesting shutdown.")
   end
 end
 
 def reboot()
-  appendLogFile('reboot()','Reboot requested')
-  rbt = Open3.capture3('sudo shutdown -r 1')
-  if rbt[2].success?
-    appendLogFile('reboot()',"status #{rbt}")
+  if runPlaybook("reboot.yaml", {"user":"demo"})
+    $prompt.ok("Reboot requested.")
   else
-    outputError('reboot()', "Failed with response #{rbt.to_s}")
+    $prompt.error("Error requesting reboot.")
   end
 end

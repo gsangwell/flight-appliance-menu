@@ -1,0 +1,9 @@
+---
+- name: Configure Firewall Ports
+  firewalld:
+    port: "{{ port }}"
+    permanent: yes
+    state: enabled
+  with_items: "{{ item.value.ports }}"
+  loop_control:
+    loop_var: port

@@ -1,0 +1,11 @@
+---
+- include_tasks: configure_interface.yaml
+  vars:
+    tmp_net: "{{ item.value.ip }}/{{ item.value.netmask }}"
+    name: "{{ item.key }}"
+    interface: "{{ item.value.interface }}"
+    ip: "{{ item.value.ip }}"
+    prefix: "{{ tmp_net | ipaddr('prefix') }}"
+    zone: "{{ item.value.zone }}"
+    gateway: "{{ item.value.gateway|default('')}}"
+  loop: "{{ networks | dict2items }}"

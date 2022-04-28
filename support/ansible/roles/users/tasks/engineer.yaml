@@ -1,0 +1,13 @@
+---
+- name: "Add engineer: {{ username }}"
+  user:
+    name: "{{ username }}"
+    comment: "{{ name }}"
+    shell: "/bin/bash"
+    groups: engineers
+
+- include_tasks: sshkey.yaml
+  when: pubkey|length > 0
+
+- include_tasks: password.yaml
+  when: password|length > 0

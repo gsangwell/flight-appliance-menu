@@ -100,7 +100,7 @@ def apiInfoInst()
   return infoInstApiHandler()
 end
 
-def apiSetKey(inputJson)
+def apiAddKey(inputJson)
   begin
     hash = JSON.parse(inputJson)
   rescue
@@ -112,7 +112,7 @@ def apiSetKey(inputJson)
     uname = hash['user-name']
     key = hash['key']
   end
-  if setUserSSHKey(uname, key)
+  if addUserSSHKey(uname, key)
     return {'user' => uname, 'status' => true}
   else
     return {'user' => uname, 'status' => false}
@@ -134,7 +134,7 @@ def apiCreateUser(inputJson)
   if response
     return {'user-name' => uname, 'status' => true}
   else
-    return {'user-name' => uname, 'status' => false, 'stdout' => response[0], 'stderr' => response[1]}
+    return {'user-name' => uname, 'status' => false}
   end
 end
 
@@ -170,7 +170,7 @@ def apiUserDelete(inputJson)
   if ! hash['user-name'].nil?
     begin
       uname = hash['user-name'] 
-      if deleteUserHandler(uname)
+      if deleteUser(uname)
         return {'user-name' => uname, 'status' => true} 
       else
         raise StandardError
@@ -318,6 +318,24 @@ def apiFirewallAllZoneDetails()
   return {'zones' => getAllFirewallZoneDetails()}
 end
 
+def apiCertSelfSigned()
+  return {'status' => generateSelfSignCert()}
+end
+
+def apiReplaceCert(inputJson)
+  begin
+    hash = JSON.parse(inputJson)
+  rescue
+    return {'status' => false}
+  end
+
+  if ! hash['cert'].nil?
+    return {'status' => replaceCert(hash['cert'])}
+  else
+    return {'status' => false}
+  end
+end
+
 def apiHelp()
   <<~HEREDOC
 
@@ -330,7 +348,7 @@ def apiHelp()
     - availabilityZone - Return Cloud Vendor Availability Zone
     - instanceType - Return Cloud Vendor Instance Type
     - userCreate - Create a user - requires '{"user-name":"<System username>","full-name":"<User's full name>"}'
-    - userSetKey - Set SSH key for a system user - requires '{"user-name":"<System username>","key":"<SSH Key to be used>"}'
+    - userAddKey - Add SSH key for a system user - requires '{"user-name":"<System username>","key":"<SSH Key to be used>"}'
     - userGetList - Return list of system users.
     - userSetPasswd - Set the user's password - requires '{"user-name":"<System username>","passwd":"<User's password>"}'
     - userDelete - Delete a user from the system - requires '{"user-name":"<System username>","delete":true}'
@@ -365,8 +383,8 @@ begin
     response = apiInstanceType()
   when 'userCreate'
     response = apiCreateUser(ARGV[1])
-  when 'userSetKey'
-    response = apiSetKey(ARGV[1])
+  when 'userAddKey'
+    response = apiAddKey(ARGV[1])
   when 'userGetList'
     response = apiGetUserList()
   when 'userSetPasswd'
@@ -401,6 +419,10 @@ begin
     response = apiShutdown(ARGV[1])
   when 'reboot'
     response = apiReboot(ARGV[1])
+  when 'certSelfSign'
+    response = apiCertSelfSigned()
+  when 'certReplace'
+    response = apiReplaceCert(ARGV[1])
   when 'help'
     response = apiHelp()
   else

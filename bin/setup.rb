@@ -49,6 +49,7 @@ require 'support_core'
 require 'network_core'
 require 'power_core'
 require 'firewall_core'
+require 'ssl_core'
 
 def setup()
   appendLogFile('------- setup() - Application Initialized, invocation source is', $INVOKE_SRC)
@@ -66,12 +67,14 @@ def setup()
     require 'network_cli'
     require 'power_cli'
     require 'firewall_cli'
+    require 'ssl_cli'
   elsif ! $INVOKE_SRC.include? 'api'
     #Any requires for API Functionality.
   end
 
   $config = YAML.load(File.read(File.expand_path('../../cfg/config.yaml',__FILE__)))
-  
+  $current_user = `whoami`.chomp
+ 
   bios = `sudo /usr/sbin/dmidecode -s bios-version | /bin/tr "[:upper:]" "[:lower:]" | /bin/grep "amazon"`
   azure = `sudo /usr/sbin/dmidecode -s chassis-manufacturer`
   systemd = `/usr/bin/systemd-detect-virt`

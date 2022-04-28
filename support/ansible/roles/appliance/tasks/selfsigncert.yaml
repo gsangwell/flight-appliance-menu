@@ -1,0 +1,7 @@
+---
+- name: Generate self-signed certificate
+  community.crypto.x509_certificate:
+    path: "{{ crt_out }}"
+    privatekey_path: "{{ key }}"
+    provider: selfsigned
+    csr_content: "{{ csr.csr }}"

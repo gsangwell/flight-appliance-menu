@@ -42,6 +42,7 @@ def mainmenu()
     menu.choice 'Network Management', 'network'
     menu.choice 'Power Management', 'power'
     menu.choice 'Firewall Management', 'firewall'
+    menu.choice 'SSL Management', 'ssl'
     menu.choice 'Alces Remote Assistance', 'support'
     menu.choice 'Launch console', 'console'
     menu.choice 'Exit menu', 'getout'
@@ -69,6 +70,8 @@ def main()
       firewall_cli()
     when 'support'
       support_cli()
+    when 'ssl'
+      ssl_cli()
     when 'getout'
       getout()
     when 'client'

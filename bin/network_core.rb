@@ -84,34 +84,19 @@ def getAllInterfaceDetails()
 end
 
 def configureInterface(name, settings)
-  int = $config['networks'][name]['interface']
+  vars = {}
+  vars['name'] = name
+  vars['interface'] = $config['networks'][name]['interface']
+  vars['ip'] = settings['ipv4']
+  vars['netmask'] = settings['netmask']
+  vars['gateway'] = settings['gateway']
+  vars['zone'] = $config['networks'][name]['zone']
 
-  if settings['static']
-  `cat << EOF | sudo /bin/tee /etc/sysconfig/network-scripts/ifcfg-#{int} > /dev/null
-BOOTPROTO=none
-DEVICE=#{int}
-ONBOOT=yes
-IPADDR=#{settings['ipv4']}
-NETMASK=#{settings['netmask']}
-EOF
-`
-  # Default gw?
-  if settings['gateway'] != nil
-    `cat << EOF | sudo /bin/tee -a /etc/sysconfig/network-scripts/ifcfg-#{int} > /dev/null
-GATEWAY=#{settings['gateway']}
-EOF
-`
-  end
-
-  # DHCP config
+  if runPlaybook("modify_network.yaml", vars)
+    appendLogFile("modifyNetwork(#{name},#{settings})",'')
+    return true
   else
-  `cat << EOF | sudo /bin/tee /etc/sysconfig/network-scripts/ifcfg-#{int} > /dev/null
-BOOTPROTO=dhcp
-DEVICE=#{int}
-ONBOOT=yes
-EOF
-`
+    quietError("modifyNetwork(#{name},#{settings})",'')
+    return false
   end
-
-  return true
 end

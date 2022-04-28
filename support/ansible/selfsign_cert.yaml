@@ -1,0 +1,8 @@
+- name: Generate Self-Signed Cert for Alces Appliance
+  hosts: localhost
+  tasks:
+    - include_tasks: roles/appliance/tasks/csr.yaml
+    - include_tasks: roles/appliance/tasks/selfsigncert.yaml
+    - include_tasks: roles/appliance/tasks/restartservice.yaml
+      vars:
+        service: nginx

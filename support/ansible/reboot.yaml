@@ -1,0 +1,7 @@
+---
+- name: Reboot Alces Appliance
+  hosts: localhost
+  tasks:
+    - name: Reboot
+      shell:
+        cmd: shutdown -r 1 "Appliance reboot initiated by user {{ user }}"

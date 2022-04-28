@@ -85,3 +85,21 @@ def outputError(source,action)
   $logger.error(out)
   $logger_stderr.error(out)
 end
+
+def runPlaybook(playbook, vars)
+  extra_vars = ""
+
+  vars.each do |var, value|
+    extra_vars += " -e \"#{var}=\'#{value}\'\""
+  end
+
+  play = Open3.capture3("sudo /bin/ansible-playbook /opt/appliance/support/ansible/#{playbook} #{extra_vars}")
+
+  if play[2].success?
+    appendLogFile("runPlaybook(#{playbook}, #{extra_vars})",play.to_s)
+    return true
+  else
+    quietError("runPlaybook(#{playbook}, #{extra_vars})",play.to_s) 
+    return false
+  end
+end

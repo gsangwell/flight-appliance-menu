@@ -26,42 +26,32 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
-def getFirewallZones()
-  #output = `/bin/firewall-cmd --get-active`
-  #zones = []
-
-  #output.each_line.with_index do |line,i|
-  #  next if line.match(/^ /)
-  #  zones << line.chomp
-  #end
-
-  #return zones
- 
-  zones = []
-
-  $config['firewall'].each do |zone, config|
-    zones << zone
+def generateCsr(cname, org, country, output)
+  if runPlaybook("generate_csr.yaml", {"cname": cname, "org": org, "country": country, "key": "/etc/ssl/nginx/key.pem", "out": output })
+    appendLogFile("generateCsr(#{cname}, #{org}, #{country})",'')
+    return true
+  else
+    quietError("generateCsr(#{cname}, #{org}, #{country})",'')
+    return false
   end
-
-  return zones 
 end
 
-def getFirewallZoneDetails(name)
-
-  zone = {}
-  zone['name'] = name
-  zone['interfaces'] = `/bin/sudo /usr/bin/firewall-cmd --list-interfaces --zone #{name}`.split
-  zone['masquerade'] = `/bin/sudo /usr/bin/firewall-cmd --query-masquerade --zone #{name}` 
-  zone['services'] = `/bin/sudo /usr/bin/firewall-cmd --list-services --zone #{name}`.split
-  zone['ports'] = `/bin/sudo /usr/bin/firewall-cmd --list-ports --zone #{name}`.split
-  return zone
+def generateSelfSignCert()
+  if runPlaybook("selfsign_cert.yaml", {"key": "/etc/ssl/nginx/key.pem", "cname": "appliance.alces.network", "org": "Alces Flight", "country": "GB", "crt_out": "/etc/ssl/nginx/fullchain.pem"})
+    appendLogFile("generateSelfSignCert()",'')
+    return true
+  else
+    quietError("generateSelfSignCert()",'')
+    return false
+  end
 end
 
-def getAllFirewallZoneDetails()
-  zones = []
-  getFirewallZones().each do |name|
-    zone = getFirewallZoneDetails(name)
-    zones << zone
+def replaceCert(cert)
+  if runPlaybook("install_cert.yaml", {"cert": cert, "dest": "/etc/ssl/nginx/fullchain.pem", "key": "/etc/ssl/nginx/key.pem"})
+    appendLogFile("replaceCert()",'')
+    return true
+  else
+    quietError("replaceCert()",'')
+    return false
   end
-  return zones
 end

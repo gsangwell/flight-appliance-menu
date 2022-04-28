@@ -1,0 +1,4 @@
+- name: Add Operator
+  hosts: localhost
+  tasks:
+    - include_tasks: roles/users/tasks/sshkey.yaml

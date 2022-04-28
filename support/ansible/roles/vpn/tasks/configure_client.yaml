@@ -1,0 +1,19 @@
+---
+- name: "Configure VPN Client: {{ item.key }}"
+  template:
+    src: client.conf
+    dest: "/etc/openvpn/client/{{ item.key }}.conf"
+  vars:
+   vpn_dev: "{{ item.value.dev }}"
+   vpn_server: "{{ item.value.server }}"
+   vpn_port: "{{ item.value.port }}"
+   vpn_ca: "{{ item.value.ca }}"
+   vpn_name: "{{ item.key }}"
+
+- name: "Configure VPN Auth: {{ item.key }}"
+  template:
+    src: auth.client
+    dest: "/etc/openvpn/client/auth.{{item.key}}"
+  vars:
+    vpn_username: "{{ item.value.username }}"
+    vpn_password: "{{ item.value.password }}"

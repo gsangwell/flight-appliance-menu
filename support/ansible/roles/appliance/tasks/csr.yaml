@@ -1,0 +1,15 @@
+---
+- name: Create (CSR) request
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: "{{ key }}"
+    common_name: "{{ cname }}"
+    organization_name: "{{ org }}"
+    country_name: "{{ country }}"
+  register: csr
+  changed_when: false
+
+- name: Write CSR to file
+  ansible.builtin.copy:
+    dest: "{{ out }}"
+    content: "{{ csr.csr }}"
+  when: out is defined

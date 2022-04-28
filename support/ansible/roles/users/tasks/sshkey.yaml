@@ -1,0 +1,6 @@
+---
+- name: "Add SSH Key: {{ username }}"
+  authorized_key:
+    user: "{{ username }}"
+    state: present
+    key: "{{ pubkey }}"

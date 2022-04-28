@@ -1,0 +1,7 @@
+- name: Modify Network
+  hosts: localhost
+  tasks:
+    - include_tasks: roles/network/tasks/configure_interface.yaml
+      vars:
+        tmp_net: "{{ ip }}/{{ netmask }}"
+        prefix: "{{ tmp_net | ipaddr('prefix') }}"

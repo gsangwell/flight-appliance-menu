@@ -1,0 +1,16 @@
+---
+- include_tasks: engineer.yaml
+  vars:
+    username: "{{ item.key }}"
+    name: "{{ item.value.name }}"
+    pubkey: "{{ item.value.pubkey }}"
+    password: "{{ item.value.password|default('') }}"
+  loop: "{{ engineers | dict2items }}"
+
+- include_tasks: operator.yaml
+  vars:
+    username: "{{ item.key }}"
+    name: "{{ item.value.name }}"
+    pubkey: "{{ item.value.pubkey|default('') }}"
+    password: "{{ item.value.password|default('') }}"
+  loop: "{{ operators | dict2items }}"

@@ -1,0 +1,31 @@
+- name: Set hostname for appliance
+  hostname:
+    name: "{{ appliance.hostname }}"
+
+- name: Create nginx private key
+  include_tasks: privkey.yaml
+  vars:
+    key_out: /etc/ssl/nginx/key.pem
+
+- name: Create CSR for self-signed certificate 
+  include_tasks: csr.yaml
+  vars:
+    cname: "{{ appliance.hostname }}"
+    org: "Alces Flight"
+    country: "GB"
+    key: /etc/ssl/nginx/key.pem
+ 
+- name: Create self-signed certificate
+  include_tasks: selfsigncert.yaml
+  vars:
+    key: /etc/ssl/nginx/key.pem
+    crt_out: /etc/ssl/nginx/fullchain.pem
+
+- name: Start GUI services
+  include_tasks: enableandstartservice.yaml
+  vars:
+    service: "{{ item }}"
+  loop:
+    - flight-terminal
+    - appliance-gui
+    - nginx

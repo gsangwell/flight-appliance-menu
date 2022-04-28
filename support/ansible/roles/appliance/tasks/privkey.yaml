@@ -1,0 +1,4 @@
+---
+- name: Create private key (RSA, 4096 bits)
+  community.crypto.openssl_privatekey:
+    path: "{{ key_out }}"

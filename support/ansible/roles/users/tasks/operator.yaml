@@ -1,0 +1,19 @@
+---
+- name: "Check user {{ username }} doesn't already exist"
+  shell: egrep "^{{ username }}" -c /etc/passwd || true
+  register: user_existing
+  changed_when: false
+
+- name: "Add operator: {{ username }}"
+  user:
+    name: "{{ username }}"
+    comment: "{{ name }}"
+    shell: "/opt/appliance/bin/flightusershell.rb"
+    groups: operators
+  when: user_existing.stdout|int == 0
+
+- include_tasks: sshkey.yaml
+  when: pubkey is defined and pubkey|length > 0 and user_existing.stdout|int == 0
+
+- include_tasks: password.yaml
+  when: password is defined and password|length > 0 and user_existing.stdout|int == 0

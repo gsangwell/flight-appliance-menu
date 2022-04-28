@@ -1,0 +1,4 @@
+- name: Generate CSR for Alces Appliance
+  hosts: localhost
+  tasks:
+    - include_tasks: roles/appliance/tasks/csr.yaml

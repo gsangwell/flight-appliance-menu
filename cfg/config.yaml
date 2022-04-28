@@ -1,9 +1,0 @@
----
-# Networks/interfaces to show
-networks:
-  external:
-    interface: eth0
-
-# Firewall zones to show
-firewall:
-  zones: [ external ]

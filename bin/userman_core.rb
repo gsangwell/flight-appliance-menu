@@ -46,12 +46,21 @@ def getUserList()
 end
 
 def createUser(uname,fname)
-  newUser = Open3.capture3("sudo \/sbin\/useradd #{uname} -G operators --comment \"#{fname}\" --shell #{$app_root}/bin/flightusershell.rb")
-  if newUser[2].success?
-    appendLogFile("createUser(#{uname},#{fname})",newUser.to_s)
+  if runPlaybook("add_operator.yaml", {"username":uname, "name":fname})
+    appendLogFile("createUser(#{uname},#{fname})",'')
     return true
   else
-    quietError("createUser(#{uname},#{fname})",newUser.to_s)
+    quietError("createUser(#{uname},#{fname})",'')
+    return false
+  end
+end
+
+def deleteUser(uname)
+  if runPlaybook("remove_operator.yaml", {"username":uname})
+    appendLogFile("deleteUser(#{uname})",'')
+    return true
+  else
+    quietError("deleteUser(#{uname})",'')
     return false
   end
 end
@@ -63,54 +72,33 @@ end
 #  return key.first
 #end
 
-def setUserSSHKey(uname, key)
-  begin
-    FileUtils.mkdir_p "/home/#{uname}/.ssh"
-    f = File.open("/home/#{uname}/.ssh/authorized_keys", 'w')
-    f.write(key)
-    f.chmod(0600)
-    f.close
-    FileUtils.chown(uname, uname, "/home/#{uname}/.ssh")
-    FileUtils.chmod(0700, "/home/#{uname}/.ssh") 
-    FileUtils.chown(uname, uname, "/home/#{uname}/.ssh/authorized_keys")
-    appendLogFile("setUserSSHKey(#{uname}, key)",'')
-    return true 
-  rescue
-    quietError("setUserSSHKey(#{uname}, key)",'')
+def addUserSSHKey(uname, key)
+  if runPlaybook("add_key.yaml", {"username":uname, "pubkey":key})
+    appendLogFile("addUserSSHKey(#{uname}, #{key})",'')
+    return true
+  else
+    quietError("addUserSSHKey(#{uname}, #{key})",'')
     return false
   end
 end
 
 def deleteUser(user)
-  Open3.capture3("\/sbin\/userdel -f #{user}")
-end
-
-def deleteUserHandler(user)
-  begin
-    deleteUserStatus = deleteUser(user)
-    if deleteUserStatus[2].success?
-      appendLogFile("deleteUserHandler(#{user})",deleteUserStatus.to_s)
-      return true
-    else
-      quietError("deleteUserHandler(#{user})",deleteUserStatus.to_s)
-      return false
-    end
-  rescue 
-    quietError("deleteUserHandler(#{user})",deleteUserStatus.to_s)
-    raise StandardError
+  if runPlaybook("remove_operator.yaml", {"username":user})
+    appendLogFile("deleteUser(#{user})", '')
+    return true
+  else
+    quietError("deleteUser(#{user})", '')
+    return false
   end
 end
 
 def setPasswd(user, password)
-  begin
-    status = Open3.capture3("echo '#{user}:#{password}' | \/sbin\/chpasswd -e")
-
-    if status[2].success?
-      appendLogFile("setPasswd(#{user}, #{password})", status.to_s)
-      return true
-    else
-      quietError("setPasswd(#{user}, #{password})", status.to_s)
-      return false
-    end
+  password = password.gsub('$', '\$')
+  if runPlaybook("change_password.yaml", {"username":user, "password":password})
+    appendLogFile("setPasswd(#{user}, #{password})", '')
+    return true
+  else
+    quietError("setPasswd(#{user}, #{password})", '')
+    return false
   end
 end

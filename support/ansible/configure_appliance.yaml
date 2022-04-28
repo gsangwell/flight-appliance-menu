@@ -1,0 +1,10 @@
+---
+- name: Configure Alces Appliance
+  hosts: localhost
+  vars_files: /opt/appliance/cfg/config.yaml
+  roles:
+    - appliance
+    - network
+    - firewall
+    - vpn
+    - users

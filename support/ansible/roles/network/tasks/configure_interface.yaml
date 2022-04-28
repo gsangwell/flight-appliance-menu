@@ -1,0 +1,19 @@
+---
+- name: "Configure Network: {{ name }}"
+  include_role:
+    name: rhel-system-roles.network
+  vars:
+    network_allow_restart: yes
+    network_connections:
+    - name: "{{ interface }}"
+      type: ethernet
+      ip:
+        dhcp4: no
+        address: "{{ ip }}/{{ prefix }}"
+        gateway4: "{{ gateway }}"
+- name: Set Firewall Zone
+  firewalld:
+    zone: "{{ zone }}"
+    interface: "{{ interface }}"
+    permanent: yes
+    state: enabled 
