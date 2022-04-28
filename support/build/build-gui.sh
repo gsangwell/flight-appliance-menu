@@ -154,9 +154,6 @@ EOF
 
 mkdir /etc/ssl/nginx
 
-# Generic key
-openssl req -x509 -newkey rsa:4096 -keyout /etc/ssl/nginx/key.pem -out /etc/ssl/nginx/fullchain.pem -days 365 -nodes -subj "/C=UK/O=Alces Flight/CN=appliance.alces.network"
-
 cat << 'EOF' > /etc/nginx/server-https.d/appliance-gui.conf
 location / {
      proxy_pass http://127.0.0.1:3000;
