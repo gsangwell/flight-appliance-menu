@@ -79,37 +79,37 @@ def setup()
   azure = `sudo /usr/sbin/dmidecode -s chassis-manufacturer`
   systemd = `/usr/bin/systemd-detect-virt`
   if bios.include? "amazon"
-    provider = 'aws'
+    $provider = 'aws'
   elsif azure.include? "Microsoft"
-    provider = 'azure'
+    $provider = 'azure'
   elsif systemd.include? 'none'
-    provider = 'metal'
+    $provider = 'metal'
   elsif systemd.include? 'vmware'
-    provider = 'metal'
+    $provider = 'metal'
   elsif systemd.include? 'kvm'
-    provider = 'metal'
+    $provider = 'metal'
   else
-    provider = 'other'
+    $provider = 'other'
   end
 
-  appendLogFile('setup() Detected Provider is:', provider)
+  appendLogFile('setup() Detected Provider is:', $provider)
 
-  if provider == 'aws'
+  if $provider == 'aws'
     require 'aws_core'
     if $INVOKE_SRC.include? 'cli'
       require 'aws_cli'
     end
-  elsif provider == 'azure'
+  elsif $provider == 'azure'
     require 'azure_core'
     if $INVOKE_SRC.include? 'cli'
       require 'azure_cli'
     end
-  elsif provider == 'metal'
+  elsif $provider == 'metal'
     require 'metal_core'
     if $INVOKE_SRC.include? 'cli'
       require 'metal_cli'
     end
   else 
-    puts "Unsupported cloud service"
+    puts "Unsupported platform type"
   end
 end

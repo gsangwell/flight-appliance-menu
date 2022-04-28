@@ -30,7 +30,7 @@ def network_cli()
   sel = $prompt.select('Choose an option') do |menu|
     menu.choice 'List Networks', 'list'
     menu.choice 'Show Network', 'show'
-    menu.choice 'Configure Network', 'config'
+    menu.choice 'Configure Network', 'config' if metalPlatform
     menu.choice 'Return', 'ret'
   end
   case sel

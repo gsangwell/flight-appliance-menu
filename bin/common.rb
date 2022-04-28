@@ -103,3 +103,7 @@ def runPlaybook(playbook, vars)
     return false
   end
 end
+
+def metalPlatform()
+  return $provider == "metal"
+end
