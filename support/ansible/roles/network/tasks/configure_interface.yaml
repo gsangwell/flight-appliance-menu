@@ -1,7 +1,7 @@
 ---
 - name: "Configure Network: {{ name }}"
   include_role:
-    name: rhel-system-roles.network
+    name: linux-system-roles.network
   vars:
     network_allow_restart: yes
     network_connections:
