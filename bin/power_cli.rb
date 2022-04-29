@@ -48,7 +48,11 @@ def shutdown_cli()
   end
   appendLogFile('shutdown_cli()', yn.to_s)
   if yn
-    shutdown()
+    if shutdown()
+      $prompt.ok("Shutdown requested.")
+    else
+      $prompt.error("Error requesting shutdown.")
+    end
   else
     main()
   end
@@ -60,7 +64,11 @@ def reboot_cli()
   end
   appendLogFile('reboot_cli()', yn.to_s)
   if yn
-    reboot()
+    if reboot()
+      $prompt.ok("Reboot requested.")
+    else
+      $prompt.error("Error requesting reboot.")
+    end
   else
     main()
   end

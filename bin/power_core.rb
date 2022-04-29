@@ -27,18 +27,9 @@
 #==============================================================================
 
 def shutdown()
-
-  if runPlaybook("shutdown.yaml", {"user":"demo"})
-    $prompt.ok("Shutdown requested.")
-  else
-    $prompt.error("Error requesting shutdown.")
-  end
+  return runPlaybook("shutdown.yaml", {"user":"demo"})
 end
 
 def reboot()
-  if runPlaybook("reboot.yaml", {"user":"demo"})
-    $prompt.ok("Reboot requested.")
-  else
-    $prompt.error("Error requesting reboot.")
-  end
+  return runPlaybook("reboot.yaml", {"user":"demo"})
 end
