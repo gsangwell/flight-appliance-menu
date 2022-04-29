@@ -87,5 +87,6 @@ def infoInstApiHandler()
   h.merge!('external-ip': extIp().gsub("\n",""))
   h.merge!('internal-ip': intIp())
   h.merge!('hostname': hostname())
+  h.merge!('type': 'cloud')
   return h
 end
