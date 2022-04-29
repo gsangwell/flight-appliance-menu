@@ -1,5 +1,0 @@
----
-- name: Reboot Alces Appliance
-  reboot:
-    pre_reboot_delay: 60
-    msg: "Appliance reboot initiated by {{ user }}"
