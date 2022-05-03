@@ -92,7 +92,7 @@ systemctl restart postgresql
 RAILS_ENV=production bin/rails db:create
 RAILS_ENV=production bin/rails db:schema:load
 RAILS_ENV=production bin/rails data:migrate
-echo "bolt_on = BoltOn.find_by(name: 'Console') ; bolt_on.enabled = true ; bolt_on.save! " |RAILS_ENV=production bin/rails console
+RAILS_ENV=production bin/rails db:seed
 rake assets:precompile
 
 ########### Nginx ##################
