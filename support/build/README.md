@@ -10,9 +10,10 @@ All packages required for installation will be installed by the provided scripts
 ## Stage 1 - Base Installation
 
 1. Boot into OS and ensure there is Network Connectivity on the physical machine.
-2. Download and run the `build-menu.sh` and ` build-gui.sh` scripts.
+2. Download and run the `build-menu.sh` and ` build-gui.sh` scripts as root.
 3. Create your appliance configuration `/opt/appliance/cfg/config.yaml` from the provided example config `/opt/appliance/cfg/example.yaml`
 4. Configure the appliance using Ansible: `ansible-playbook /opt/appliance/support/ansible/configure_appliance.yaml`
+5. Restart the appliance to start using the configured settings.
 
 A good quick test to ensure that the base installation has succeeded is to invoke the API by calling:
 
