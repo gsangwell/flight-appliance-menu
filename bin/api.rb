@@ -322,6 +322,29 @@ def apiCertSelfSigned()
   return {'status' => generateSelfSignCert()}
 end
 
+def apiCertCSR(inputJson)
+  begin
+    hash = JSON.parse(inputJson)
+  rescue
+    return {'status' => false}
+  end
+
+  if !hash['cname'].nil? and !hash['org'].nil? and !hash['country'].nil?
+    begin
+      if !generateCsr("test01", hash['org'], hash['country'], '/tmp/csr.out')
+        return {'status' => false}
+      else
+        csr = `cat /tmp/csr.out; rm -rf /tmp/csr.out 2>&1 > /dev/null`
+        return {'status' => true, 'csr' => csr}
+      end
+    rescue
+      return {'status' => false}
+    end
+  else
+    return {'status' => false}
+  end
+end
+
 def apiReplaceCert(inputJson)
   begin
     hash = JSON.parse(inputJson)
@@ -421,6 +444,8 @@ begin
     response = apiReboot(ARGV[1])
   when 'certSelfSign'
     response = apiCertSelfSigned()
+  when 'certCSR'
+    response = apiCertCSR(ARGV[1])
   when 'certReplace'
     response = apiReplaceCert(ARGV[1])
   when 'help'
