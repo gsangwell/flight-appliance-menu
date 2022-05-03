@@ -1,7 +1,6 @@
 # flight-appliance-menu
 
-Menu driven application for management of multiple clusters via a 
-single cloud "appliance"
+Menu driven application for basic management of an 'appliance'.
 
 # Contributing
 
