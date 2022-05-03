@@ -20,8 +20,8 @@ networks:
     interface: eth0
     ip: 10.23.1.1
     netmask: 255.255.255.0
+    gateway: 10.23.1.1
     zone: external
-    description: "This is the cable plugged into your onsite local network switch."
 
 # Firewall zones to setup
 firewall:
