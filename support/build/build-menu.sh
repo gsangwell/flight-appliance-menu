@@ -60,7 +60,7 @@ chown root:operators /var/log/alces/flightappmenu
 chmod 775 /var/log/alces
 chmod 664 /var/log/alces/flightappmenu
 
-######## Spash screen ##############
+######## Grub spash screen ##############
 cat << EOF > /etc/default/grub
 GRUB_DISTRIBUTOR="$(sed 's, release .*$,,g' /etc/system-release)"
 GRUB_DEFAULT=saved
@@ -75,3 +75,9 @@ EOF
 
 cp /opt/appliance/support/build/alces.png /boot/grub2/alces.png 
 grub2-mkconfig -o /boot/grub2/grub.cfg
+
+######## Plymouth boot screen ##############
+yum install -y plymouth plymouth-theme-spinner
+cp -R /opt/appliance/support/plymouth/alces /usr/share/plymouth/themes/
+plymouth-set-default-theme alces
+dracut -f
