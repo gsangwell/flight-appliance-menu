@@ -66,8 +66,8 @@ def getInterfaceDetails(name)
     end
   end
 
-  interface['status'] = `cat /sys/class/net/eth0/subsystem/#{int}/operstate`.chomp
-  interface['mac'] = `cat /sys/class/net/eth0/subsystem/#{int}/address`.chomp
+  interface['status'] = `cat /sys/class/net/#{int}/operstate`.chomp
+  interface['mac'] = `cat /sys/class/net/#{int}/address`.chomp
   interface['firewall_zone'] = `firewall-cmd --get-zone-of-interface #{int} 2>&1`.chomp
 
 
