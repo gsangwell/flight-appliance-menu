@@ -1,3 +1,6 @@
 ---
 - include_tasks: configure_zone.yaml
+  vars:
+    zone: "{{ item.value.name }}"
+    ports: "{{ item.value.ports }}"
   loop: "{{ firewall | dict2items }}"
