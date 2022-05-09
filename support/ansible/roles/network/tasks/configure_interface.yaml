@@ -11,9 +11,4 @@
         dhcp4: no
         address: "{{ ip }}/{{ prefix }}"
         gateway4: "{{ gateway }}"
-- name: Set Firewall Zone
-  firewalld:
-    zone: "{{ zone }}"
-    interface: "{{ interface }}"
-    permanent: yes
-    state: enabled 
+      zone: "{{ zone }}"
