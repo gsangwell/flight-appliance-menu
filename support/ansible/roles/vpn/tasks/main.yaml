@@ -1,3 +1,11 @@
 ---
 - include_tasks: configure_client.yaml
+  vars:
+    name: "{{ item.key }}"
+    dev: "{{ item.value.dev }}"
+    server: "{{ item.value.server }}"
+    port: "{{ item.value.port }}"
+    ca: "{{ item.value.ca }}"
+    username: "{{ item.value.username }}"
+    password: "{{ item.value.password }}"
   loop: "{{ vpn | dict2items }}"
