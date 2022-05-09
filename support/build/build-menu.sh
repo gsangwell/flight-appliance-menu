@@ -61,16 +61,14 @@ chmod 775 /var/log/alces
 chmod 664 /var/log/alces/flightappmenu
 
 ######## Grub spash screen ##############
-cat << EOF > /etc/default/grub
+cat << 'EOF' > /etc/default/grub
 GRUB_DISTRIBUTOR="$(sed 's, release .*$,,g' /etc/system-release)"
 GRUB_DEFAULT=saved
 GRUB_DISABLE_SUBMENU=true
 GRUB_DISABLE_RECOVERY="true"
 GRUB_BACKGROUND="/boot/grub2/alces.png"
 GRUB_TIMEOUT=0
-GRUB_CMDLINE_LINUX="console=ttyS0"
-GRUB_CMDLINE_LINUX_DEFAULT="splash quiet"
-GRUB_TERMINAL_OUTPUT="gfxterm"
+GRUB_CMDLINE_LINUX_DEFAULT="rhgb quiet"
 EOF
 
 cp /opt/appliance/support/build/alces.png /boot/grub2/alces.png 
@@ -78,6 +76,28 @@ grub2-mkconfig -o /boot/grub2/grub.cfg
 
 ######## Plymouth boot screen ##############
 yum install -y plymouth plymouth-theme-spinner
-cp -R /opt/appliance/support/plymouth/alces /usr/share/plymouth/themes/
+
+cp -R /usr/share/plymouth/themes/spinner /usr/share/plymouth/themes/alces
+rm -rf /usr/share/plymouth/themes/alces/spinner.plymouth
+cp /opt/appliance/support/build/logo.png /usr/share/plymouth/themes/alces/watermark.png
+
+cat << EOF > /usr/share/plymouth/themes/alces/alces.plymouth
+[Plymouth Theme]
+Name=Alces
+Description=Alces boot screen
+ModuleName=two-step
+
+[two-step]
+ImageDir=/usr/share/plymouth/themes/alces
+HorizontalAlignment=.5
+VerticalAlignment=.9
+WatermarkHorizontalAlignment=.5
+WatermarkVerticalAlignment=.5
+Transition=none
+TransitionDuration=0.0
+BackgroundStartColor=0x000000
+BackgroundEndColor=0x000000
+EOF
+
 plymouth-set-default-theme alces
 dracut -f
