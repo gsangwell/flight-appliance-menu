@@ -2,6 +2,8 @@
 
 FLIGHT_GUI_BRANCH=master
 
+source /etc/profile.d/rvm.sh
+
 ########### Flight Terminal ##################
 
 yum -y install postgresql-server postgresql-devel
