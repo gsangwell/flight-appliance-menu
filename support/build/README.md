@@ -4,6 +4,8 @@ Prerequisites:
   - A blank physical machine.
   - Internet connectivity to that machine.
   - Blank RHEL installation with configured networking
+  - SELinux disabled
+  - SSH password login enabled
 
 All packages required for installation will be installed by the provided scripts.
 
