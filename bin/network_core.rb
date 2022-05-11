@@ -91,6 +91,7 @@ def configureInterface(name, settings)
   vars['netmask'] = settings['netmask']
   vars['gateway'] = settings['gateway']
   vars['zone'] = $config['networks'][name]['zone']
+  vars['dns'] = settings['dns']
 
   if runPlaybook("modify_network.yaml", vars)
     appendLogFile("modifyNetwork(#{name},#{settings})",'')

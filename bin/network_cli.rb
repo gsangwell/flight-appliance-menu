@@ -124,9 +124,22 @@ def configureNetwork(network)
     config['gateway'] = ""
   end
 
+  yn = $prompt.yes?("Set a DNS server?") do |q|
+    q.default false
+  end
+
+  if yn
+    config['dns'] = $prompt.ask("DNS Server:", required: true) do |q|
+      q.validate(/^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$/, "Invalid IPV4 Address")
+    end
+  else
+    config['dns'] = ""
+  end
+
   table << ['IPV4:', config['ipv4']]
   table << ['Netmask:', config['netmask']]
-  table << ['Default Gateway:', config['gateway'] == nil ? 'None' : config['gateway']]
+  table << ['Default Gateway:', config['gateway'] == "" ? 'None' : config['gateway']]
+  table << ['DNS:', config['dns'] == "" ? 'None' : config['dns']]
 
   puts outputTable("New Network Settings", table)
 
