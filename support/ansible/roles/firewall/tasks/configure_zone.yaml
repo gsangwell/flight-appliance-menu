@@ -1,4 +1,21 @@
 ---
+- name: Create Firewall Zone "{{ zone }}"
+  firewalld:
+    zone: "{{ zone }}"
+    state: present
+    permanent: yes
+
+- name: Reload firewalld
+  command: firewall-cmd --reload
+
+- name: Configure masquerade "{{ zone }}"
+  firewalld:
+    zone: "{{ zone }}"
+    masquerade: "yes"
+    permanent: yes
+    state: "{{ masquerade }}"
+    immediate: yes
+
 - name: Configure Firewall Ports
   firewalld:
     zone: "{{ zone }}"
