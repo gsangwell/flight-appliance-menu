@@ -87,13 +87,23 @@ def apiIntIp()
 end
 
 def apiGetUserList()
-  if users = getUserList()
+  begin
     h = {}
     h.merge!(users: getUserList())
     return h
-  else
+  rescue
     return {'status' => false} 
   end 
+end
+
+def apiGetOperatorList()
+  begin
+    h = {}
+    h.merge!(users: getOperatorList())
+    return h
+  rescue
+    return {'status' => false}
+  end
 end
 
 def apiInfoInst()
@@ -372,7 +382,8 @@ def apiHelp()
     - instanceType - Return Cloud Vendor Instance Type
     - userCreate - Create a user - requires '{"user-name":"<System username>","full-name":"<User's full name>"}'
     - userAddKey - Add SSH key for a system user - requires '{"user-name":"<System username>","key":"<SSH Key to be used>"}'
-    - userGetList - Return list of system users.
+    - userGetList - Return list of all system users.
+    - userGetOperators - Returns a list of system operators.
     - userSetPasswd - Set the user's password - requires '{"user-name":"<System username>","passwd":"<User's password>"}'
     - userDelete - Delete a user from the system - requires '{"user-name":"<System username>","delete":true}'
     - supportStatus - Return the status of the Alces Support VPN.
@@ -410,6 +421,8 @@ begin
     response = apiAddKey(ARGV[1])
   when 'userGetList'
     response = apiGetUserList()
+  when 'userGetOperators'
+    response = apiGetOperatorList()
   when 'userSetPasswd'
     response = apiUserSetPasswd(ARGV[1])
   when 'userDelete'

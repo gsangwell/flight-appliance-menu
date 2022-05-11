@@ -56,7 +56,7 @@ def usermenu()
 end
 
 def viewusers()
-  if users = getUserList()
+  if users = getOperatorList()
     return outputTable("Users", users.zip)
   else
     return false
@@ -176,7 +176,7 @@ def delUser(user)
 end
 
 def userSelectPrompt(prompt_msg="Select user: ", callback)
-  choices = getUserList()
+  choices = getOperatorList()
   choices << {name: "Cancel", value: "cancel"}
   user = $prompt.select("#{prompt_msg}", choices)
   return if user == "cancel"

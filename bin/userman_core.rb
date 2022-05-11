@@ -26,16 +26,33 @@
 # https://github.com/alces-software/flight-appliance-menu
 #==============================================================================
 
+def getOperatorList()
+  begin
+    operatorlistraw = Open3.capture3("sudo lid -g operators -n")
+    if operatorlistraw[2].success?
+      operatorlist = []
+      operatorlistraw[0].split.each do |o|
+        operatorlist << o
+      end
+      return operatorlist 
+    else
+      raise StandardError
+    end
+  rescue
+    quietError('getOperatorList()', "Command failed with: #{operatorlistraw}")
+    return false
+  end
+end
+
 def getUserList()
   begin
-    userlistraw = Open3.capture3("sudo lid -g operators -n")
+    userlistraw = Open3.capture3("sudo awk -F: '{ print $1}' /etc/passwd")
     if userlistraw[2].success?
       userlist = []
       userlistraw[0].split.each do |u|
-        next if u == "alces-operator"
         userlist << u
       end
-      return userlist 
+      return userlist
     else
       raise StandardError
     end
@@ -46,6 +63,12 @@ def getUserList()
 end
 
 def createUser(uname,fname)
+  # check user doesn't already exist
+  if `egrep "^#{uname}" -c /etc/passwd || true`.to_i > 0
+    quietError("createUser(#{uname},#{fname})",'')
+    return false
+  end
+
   if runPlaybook("add_operator.yaml", {"username":uname, "name":fname})
     appendLogFile("createUser(#{uname},#{fname})",'')
     return true
