@@ -33,8 +33,8 @@ groupadd engineers
 groupadd operators
 
 ############ Engineer sudo rule ############
-cat << EOF > /etc/sudoers.d/engineer
-engineer    ALL=(ALL)       NOPASSWD: ALL
+cat << EOF > /etc/sudoers.d/engineers
+%engineers    ALL=(ALL)       NOPASSWD: ALL
 EOF
 
 ############ Operator sudo rule to allow system commands ############
