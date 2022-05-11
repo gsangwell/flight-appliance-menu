@@ -11,4 +11,21 @@
         dhcp4: no
         address: "{{ ip }}/{{ prefix }}"
         gateway4: "{{ gateway }}"
+        dns: "{{ dns }}"
       zone: "{{ zone }}"
+  when: gateway|length > 0
+
+- name: "Configure Network: {{ name }}"
+  include_role:
+    name: linux-system-roles.network
+  vars:
+    network_allow_restart: yes
+    network_connections:
+    - name: "{{ interface }}"
+      type: ethernet
+      ip:
+        dhcp4: no
+        address: "{{ ip }}/{{ prefix }}"
+        dns: "{{ dns }}"
+      zone: "{{ zone }}"
+  when: gateway|length == 0

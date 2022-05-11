@@ -1,43 +1,54 @@
 ---
 appliance:
-  hostname: appliance-hub
+  hostname: appliance-hub # appliance hostname
 
+# Engineer users to create with sudo privaleges
+# Typically for operators to login remotely
 engineers:
-  engineer:
-    name: Engineer
-    pubkey: |
+  engineer: # username
+    name: Engineer # full name
+    pubkey: | # publickey
       ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDM8aIT5PacKM1y6D2r6v6efYksEkTMzGlK5ro+DWTp+22fA5QUNCSi7TD/j5bRY7WLDrbn4CQWD5yBrg13FCuSZ9IjWHU7eIAI1Qnls736nu1AkSzcraGIqugwMNwtmF1AXkZXCtTmj/omwKxsKMoN+gQs6afMBpaSuCdDlhr3Q5v0ZyQIN+A4uf4RxlnCA+F43iQ7mVuwIdq5xJEH4GJYK1ObQ9V3dFzhz+EV9hRQJy1GTBng/j8X0EclYT60/ZlA/VtZWjHWVnOm+3mojTrNgAhyPKG9m3aLY2NNAo1/igLOYa7yTe32T5jj8JDzo1rk8/vEeAUuIHT8Kwa7MXy1 examplepublickey
+    #password: # optional encrypted password
 
+# operator users to create - unprivaledged users with shell set to the appliance cli
 operators:
-  demo:
-    name: Demo Operator
-    password: $6$5fa03etz$rU/235FEnuA8ATBOt1fkjsa6aNPMZh6/FifoHQKFbTYiRwcQ0.mjQ8IYlylBA1ph4ghkPNhmG6gKS3CAts3ew0 #demo123
+  demo: # username
+    name: Demo Operator # full name
+    password: $6$5fa03etz$rU/235FEnuA8ATBOt1fkjsa6aNPMZh6/FifoHQKFbTYiRwcQ0.mjQ8IYlylBA1ph4ghkPNhmG6gKS3CAts3ew0 # password (demo123)
+    #pubkey: # optional pubkey
 
-# Network interfaces to configure
+# Network interfaces to set to "defaults" and allow the operators to reconfigure
+# The first interface set here is the first interface configured for access to the appliance gui.
 networks:
-  external:
-    name: external
-    interface: eth0
-    ip: 10.23.1.1
-    netmask: 255.255.255.0
-    gateway: 10.23.1.1
-    zone: external
+  site-external: # name to show via gui / cli
+    interface: eth0 # interface to assign to this network
+    ip: 10.23.1.1 # IPV4
+    netmask: 255.255.255.0 # netmask
+    gateway: 10.23.1.1 # optional default gateway
+    zone: site-external # firewall zone
+    dns: 8.8.8.8 # optional dns
 
 # Firewall zones to setup
 firewall:
-  external:
-    name: external
-    ports: [ "80/tcp", "443/tcp" ]
+  site-external: # name
+    masquerade: false # enable masquerade
+    ports: [ "80/tcp", "443/tcp" ] # ports to open
+
+  support-vpn:
+    masquerade: false
+    ports: [ "22/tcp" ]
 
 # VPN clients to setup
 vpn:
-  alces-support:
-    dev: tun0
-    server: vpn.example.com
-    port: 1234
-    username: vpn.user
-    password: vpn.pass
-    ca: |
+  alces-support: # name of the vpn client
+    zone: support-vpn # firewall zone
+    dev: tun0 # tun device to set
+    server: vpn.example.com # vpn server
+    port: 1234 # vpn port
+    username: vpn.user # vpn username
+    password: vpn.pass # vpn password
+    ca: | # vpn CA certificate
       -----BEGIN EXAMPLE CERTIFICATE-----
       ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890/+=ABCDEFGHIJKLMNOPQRSTUVWXY
       Z1234567890/+=ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890/+=ABCDEFGHIJK

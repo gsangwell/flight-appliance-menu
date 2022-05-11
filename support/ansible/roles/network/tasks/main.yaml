@@ -8,4 +8,5 @@
     prefix: "{{ tmp_net | ipaddr('prefix') }}"
     zone: "{{ item.value.zone }}"
     gateway: "{{ item.value.gateway|default('')}}"
+    dns: "{{ item.value.dns|default('') }}"
   loop: "{{ networks | dict2items }}"
