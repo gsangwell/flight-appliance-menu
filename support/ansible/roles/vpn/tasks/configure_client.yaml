@@ -17,3 +17,11 @@
   vars:
     vpn_username: "{{ username }}"
     vpn_password: "{{ password }}"
+
+- name: "Set firewall zone: {{ name }}"
+  firewalld:
+    zone: "{{ zone }}"
+    interface: "{{ dev }}"
+    state: enabled
+    permanent: yes
+    immediate: yes

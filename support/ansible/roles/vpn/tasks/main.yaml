@@ -8,4 +8,5 @@
     ca: "{{ item.value.ca }}"
     username: "{{ item.value.username }}"
     password: "{{ item.value.password }}"
+    zone: "{{ item.value.zone }}"
   loop: "{{ vpn | dict2items }}"
