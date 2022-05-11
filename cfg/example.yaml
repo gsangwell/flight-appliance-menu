@@ -32,11 +32,11 @@ networks:
 # Firewall zones to setup
 firewall:
   site-external: # name
-    masquerade: false # enable masquerade
+    masquerade: disabled # enabled/disabled
     ports: [ "80/tcp", "443/tcp" ] # ports to open
 
   support-vpn:
-    masquerade: false
+    masquerade: disabled
     ports: [ "22/tcp" ]
 
 # VPN clients to setup
