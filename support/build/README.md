@@ -3,9 +3,9 @@
 Prerequisites:
   - A blank physical machine.
   - Internet connectivity to that machine.
-  - Blank RHEL installation with configured networking
-  - SELinux disabled
-  - SSH password login enabled
+  - Blank RHEL7 installation.
+  - SELinux disabled.
+  - SSH password login enabled.
 
 All packages required for installation will be installed by the provided scripts.
 
@@ -13,7 +13,7 @@ All packages required for installation will be installed by the provided scripts
 
 1. Boot into OS and ensure there is Network Connectivity on the physical machine.
 2. Download and run the `build-menu.sh` and ` build-gui.sh` scripts as root.
-3. Create your appliance configuration `/opt/appliance/cfg/config.yaml` from the provided example config `/opt/appliance/cfg/example.yaml`
+3. Create your appliance configuration `/opt/appliance/cfg/config.yaml` from the documented example config `/opt/appliance/cfg/example.yaml`
 4. Configure the appliance using Ansible: `ansible-playbook /opt/appliance/support/ansible/configure_appliance.yaml`
 5. Restart the appliance to start using the configured settings.
 

@@ -1,9 +1,13 @@
 ---
+#
+# Appliance settings
+#
 appliance:
   hostname: appliance-hub # appliance hostname
 
-# Engineer users to create with sudo privaleges
-# Typically for operators to login remotely
+#
+# Engineer users (sudo privileges)
+#
 engineers:
   engineer: # username
     name: Engineer # full name
@@ -11,25 +15,32 @@ engineers:
       ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDM8aIT5PacKM1y6D2r6v6efYksEkTMzGlK5ro+DWTp+22fA5QUNCSi7TD/j5bRY7WLDrbn4CQWD5yBrg13FCuSZ9IjWHU7eIAI1Qnls736nu1AkSzcraGIqugwMNwtmF1AXkZXCtTmj/omwKxsKMoN+gQs6afMBpaSuCdDlhr3Q5v0ZyQIN+A4uf4RxlnCA+F43iQ7mVuwIdq5xJEH4GJYK1ObQ9V3dFzhz+EV9hRQJy1GTBng/j8X0EclYT60/ZlA/VtZWjHWVnOm+3mojTrNgAhyPKG9m3aLY2NNAo1/igLOYa7yTe32T5jj8JDzo1rk8/vEeAUuIHT8Kwa7MXy1 examplepublickey
     #password: # optional encrypted password
 
-# operator users to create - unprivaledged users with shell set to the appliance cli
+#
+# Operator user (unprivileged cli / gui users)
+# 
 operators:
   demo: # username
     name: Demo Operator # full name
     password: $6$5fa03etz$rU/235FEnuA8ATBOt1fkjsa6aNPMZh6/FifoHQKFbTYiRwcQ0.mjQ8IYlylBA1ph4ghkPNhmG6gKS3CAts3ew0 # password (demo123)
     #pubkey: # optional pubkey
 
-# Network interfaces to set to "defaults" and allow the operators to reconfigure
-# The first interface set here is the first interface configured for access to the appliance gui.
+#
+# Default network settings to configure
+# The first network set here is configured via the setup wizard
+# The rest are reconfigurable from the cli / gui
+#
 networks:
-  site-external: # name to show via gui / cli
+  site-external: # User facing name
     interface: eth0 # interface to assign to this network
-    ip: 10.23.1.1 # IPV4
+    ip: 10.23.1.1 # IPV4 address
     netmask: 255.255.255.0 # netmask
     gateway: 10.23.1.1 # optional default gateway
     zone: site-external # firewall zone
     dns: 8.8.8.8 # optional dns
 
-# Firewall zones to setup
+#
+# Firewall zones
+#
 firewall:
   site-external: # name
     masquerade: disabled # enabled/disabled
@@ -39,7 +50,10 @@ firewall:
     masquerade: disabled
     ports: [ "22/tcp" ]
 
+#
 # VPN clients to setup
+# Currently only supports one vpn client called "alces-support"
+#
 vpn:
   alces-support: # name of the vpn client
     zone: support-vpn # firewall zone
