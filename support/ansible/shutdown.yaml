@@ -1,5 +1,6 @@
 ---
 - name: Reboot Alces Appliance
+  gather_facts: no
   hosts: localhost
   tasks:
     - name: Reboot

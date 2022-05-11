@@ -1,8 +1,0 @@
----
-- name: Reboot Alces Appliance
-  hosts: localhost
-  tasks:
-    - name: Reboot
-      reboot:
-        pre_reboot_delay: 60
-        msg: "Appliance reboot initiated by {{ user }}"
